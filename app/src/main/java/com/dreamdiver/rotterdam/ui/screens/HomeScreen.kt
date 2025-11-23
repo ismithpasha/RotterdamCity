@@ -46,6 +46,7 @@ fun HomeScreen(
     onNavigateToEmergency: () -> Unit = {},
     onNavigateToHospital: () -> Unit = {},
     onNavigateToEducational: () -> Unit = {},
+    onNavigateToServiceList: (Int, String) -> Unit = { _, _ -> },
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -81,12 +82,8 @@ fun HomeScreen(
                         CategoryCard(
                             category = category,
                             onClick = {
-                                when (category.name) {
-                                    "Emergency Services" -> onNavigateToEmergency()
-                                    "Healthcare" -> onNavigateToHospital()
-                                    "Education" -> onNavigateToEducational()
-                                    else -> { /* Handle other categories */ }
-                                }
+                                // Navigate to service list for all categories
+                                onNavigateToServiceList(category.id, category.name)
                             }
                         )
                     }

@@ -37,6 +37,7 @@ import com.dreamdiver.rotterdam.ui.screens.MoreScreen
 import com.dreamdiver.rotterdam.ui.screens.NoticeScreen
 import com.dreamdiver.rotterdam.ui.screens.PrivacyPolicyScreen
 import com.dreamdiver.rotterdam.ui.screens.ProfileScreen
+import com.dreamdiver.rotterdam.ui.screens.ServiceListScreen
 import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
 import com.dreamdiver.rotterdam.util.Strings
@@ -73,6 +74,7 @@ fun CumillaCityApp(
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     var currentDetailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
+    var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
 
     if (currentDetailScreen != null) {
         // Show detail screen without bottom navigation
@@ -105,6 +107,19 @@ fun CumillaCityApp(
                 isEnglish = isEnglish,
                 onBackClick = { currentDetailScreen = null }
             )
+            DetailScreen.SERVICE_LIST -> {
+                serviceListState?.let { state ->
+                    ServiceListScreen(
+                        categoryId = state.categoryId,
+                        categoryName = state.categoryName,
+                        isEnglish = isEnglish,
+                        onBackClick = {
+                            currentDetailScreen = null
+                            serviceListState = null
+                        }
+                    )
+                }
+            }
             null -> {} // Should never happen due to if condition above
         }
     } else {
@@ -133,7 +148,11 @@ fun CumillaCityApp(
                         isEnglish = isEnglish,
                         onNavigateToEmergency = { currentDetailScreen = DetailScreen.EMERGENCY_SERVICE },
                         onNavigateToHospital = { currentDetailScreen = DetailScreen.HOSPITAL_LIST },
-                        onNavigateToEducational = { currentDetailScreen = DetailScreen.EDUCATIONAL }
+                        onNavigateToEducational = { currentDetailScreen = DetailScreen.EDUCATIONAL },
+                        onNavigateToServiceList = { categoryId, categoryName ->
+                            serviceListState = ServiceListState(categoryId, categoryName)
+                            currentDetailScreen = DetailScreen.SERVICE_LIST
+                        }
                     )
                     AppDestinations.FAVORITES -> FavoritesScreen(
                         modifier = Modifier.padding(innerPadding)
@@ -182,8 +201,15 @@ enum class DetailScreen {
     TERMS_CONDITIONS,
     EMERGENCY_SERVICE,
     HOSPITAL_LIST,
-    EDUCATIONAL
+    EDUCATIONAL,
+    SERVICE_LIST
 }
+
+// State holder for service list navigation
+data class ServiceListState(
+    val categoryId: Int,
+    val categoryName: String
+)
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
