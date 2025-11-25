@@ -29,32 +29,42 @@ import androidx.lifecycle.lifecycleScope
 import com.dreamdiver.rotterdam.data.PreferencesManager
 import com.dreamdiver.rotterdam.ui.screens.AboutUsScreen
 import com.dreamdiver.rotterdam.ui.screens.EducationalScreen
+import com.dreamdiver.rotterdam.ui.screens.EditProfileScreen
 import com.dreamdiver.rotterdam.ui.screens.EmergencyServiceScreen
 import com.dreamdiver.rotterdam.ui.screens.FavoritesScreen
 import com.dreamdiver.rotterdam.ui.screens.HomeScreen
 import com.dreamdiver.rotterdam.ui.screens.HospitalListScreen
+import com.dreamdiver.rotterdam.ui.screens.LoginScreen
 import com.dreamdiver.rotterdam.ui.screens.MoreScreen
 import com.dreamdiver.rotterdam.ui.screens.NoticeScreen
 import com.dreamdiver.rotterdam.ui.screens.PrivacyPolicyScreen
 import com.dreamdiver.rotterdam.ui.screens.ProfileScreen
+import com.dreamdiver.rotterdam.ui.screens.RegisterScreen
 import com.dreamdiver.rotterdam.ui.screens.ServiceListScreen
 import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
+import com.dreamdiver.rotterdam.ui.viewmodel.AuthViewModel
 import com.dreamdiver.rotterdam.util.Strings
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var preferencesManager: PreferencesManager
+    private lateinit var authViewModel: AuthViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferencesManager = PreferencesManager(applicationContext)
+        authViewModel = AuthViewModel(preferencesManager = preferencesManager)
         enableEdgeToEdge()
         setContent {
             RotterdamCityTheme {
                 val isEnglish = preferencesManager.isEnglish.collectAsState(initial = true)
+                val isLoggedIn = authViewModel.isLoggedIn.collectAsState()
                 CumillaCityApp(
                     isEnglish = isEnglish.value,
+                    isLoggedIn = isLoggedIn.value,
+                    authViewModel = authViewModel,
+                    preferencesManager = preferencesManager,
                     onLanguageChange = { newIsEnglish ->
                         lifecycleScope.launch {
                             preferencesManager.setLanguage(newIsEnglish)
@@ -70,11 +80,35 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun CumillaCityApp(
     isEnglish: Boolean = true,
+    isLoggedIn: Boolean = false,
+    authViewModel: AuthViewModel? = null,
+    preferencesManager: PreferencesManager? = null,
     onLanguageChange: (Boolean) -> Unit = {}
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     var currentDetailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
+    var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(if (!isLoggedIn) AuthScreen.LOGIN else null) }
+
+    // Show auth screens if not logged in
+    if (!isLoggedIn && showAuthScreen != null && authViewModel != null) {
+        when (showAuthScreen) {
+            AuthScreen.LOGIN -> LoginScreen(
+                viewModel = authViewModel,
+                onLoginSuccess = { showAuthScreen = null },
+                onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
+                isEnglish = isEnglish
+            )
+            AuthScreen.REGISTER -> RegisterScreen(
+                viewModel = authViewModel,
+                onRegisterSuccess = { showAuthScreen = null },
+                onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
+                isEnglish = isEnglish
+            )
+            null -> {} // Should never happen due to outer if condition
+        }
+        return
+    }
 
     if (currentDetailScreen != null) {
         // Show detail screen without bottom navigation
@@ -120,6 +154,16 @@ fun CumillaCityApp(
                     )
                 }
             }
+            DetailScreen.EDIT_PROFILE -> {
+                if (preferencesManager != null && authViewModel != null) {
+                    EditProfileScreen(
+                        viewModel = authViewModel,
+                        preferencesManager = preferencesManager,
+                        onBackClick = { currentDetailScreen = null },
+                        isEnglish = isEnglish
+                    )
+                }
+            }
             null -> {} // Should never happen due to if condition above
         }
     } else {
@@ -157,9 +201,18 @@ fun CumillaCityApp(
                     AppDestinations.FAVORITES -> FavoritesScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
-                    AppDestinations.PROFILE -> ProfileScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    AppDestinations.PROFILE -> {
+                        if (preferencesManager != null && authViewModel != null) {
+                            ProfileScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                preferencesManager = preferencesManager,
+                                authViewModel = authViewModel,
+                                onLogout = { authViewModel.logout() },
+                                onEditProfile = { currentDetailScreen = DetailScreen.EDIT_PROFILE },
+                                isEnglish = isEnglish
+                            )
+                        }
+                    }
                     AppDestinations.MORE -> MoreScreen(
                         modifier = Modifier.padding(innerPadding),
                         isEnglish = isEnglish,
@@ -202,7 +255,13 @@ enum class DetailScreen {
     EMERGENCY_SERVICE,
     HOSPITAL_LIST,
     EDUCATIONAL,
-    SERVICE_LIST
+    SERVICE_LIST,
+    EDIT_PROFILE
+}
+
+enum class AuthScreen {
+    LOGIN,
+    REGISTER
 }
 
 // State holder for service list navigation
