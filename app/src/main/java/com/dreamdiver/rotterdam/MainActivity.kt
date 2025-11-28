@@ -1,6 +1,8 @@
 package com.dreamdiver.rotterdam 
 
 import android.os.Bundle
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -41,6 +43,7 @@ import com.dreamdiver.rotterdam.ui.screens.PrivacyPolicyScreen
 import com.dreamdiver.rotterdam.ui.screens.ProfileScreen
 import com.dreamdiver.rotterdam.ui.screens.RegisterScreen
 import com.dreamdiver.rotterdam.ui.screens.ServiceListScreen
+import com.dreamdiver.rotterdam.ui.screens.SubCategoryListScreen
 import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
 import com.dreamdiver.rotterdam.ui.viewmodel.AuthViewModel
@@ -88,6 +91,7 @@ fun CumillaCityApp(
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     var currentDetailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
+    var subcategoryListState by rememberSaveable { mutableStateOf<SubCategoryListState?>(null) }
     var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(if (!isLoggedIn) AuthScreen.LOGIN else null) }
 
     // Show auth screens if not logged in
@@ -141,10 +145,31 @@ fun CumillaCityApp(
                 isEnglish = isEnglish,
                 onBackClick = { currentDetailScreen = null }
             )
+            DetailScreen.SUBCATEGORY_LIST -> {
+                subcategoryListState?.let { state ->
+                    SubCategoryListScreen(
+                        categoryId = state.categoryId,
+                        categoryName = state.categoryName,
+                        isEnglish = isEnglish,
+                        onBackClick = {
+                            currentDetailScreen = null
+                            subcategoryListState = null
+                        },
+                        onSubCategoryClick = { subcategoryId, subcategoryName ->
+                            serviceListState = ServiceListState(
+                                subcategoryId = subcategoryId,
+                                categoryName = subcategoryName
+                            )
+                            currentDetailScreen = DetailScreen.SERVICE_LIST
+                        }
+                    )
+                }
+            }
             DetailScreen.SERVICE_LIST -> {
                 serviceListState?.let { state ->
                     ServiceListScreen(
                         categoryId = state.categoryId,
+                        subcategoryId = state.subcategoryId,
                         categoryName = state.categoryName,
                         isEnglish = isEnglish,
                         onBackClick = {
@@ -194,8 +219,8 @@ fun CumillaCityApp(
                         onNavigateToHospital = { currentDetailScreen = DetailScreen.HOSPITAL_LIST },
                         onNavigateToEducational = { currentDetailScreen = DetailScreen.EDUCATIONAL },
                         onNavigateToServiceList = { categoryId, categoryName ->
-                            serviceListState = ServiceListState(categoryId, categoryName)
-                            currentDetailScreen = DetailScreen.SERVICE_LIST
+                            subcategoryListState = SubCategoryListState(categoryId, categoryName)
+                            currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
                         }
                     )
                     AppDestinations.FAVORITES -> FavoritesScreen(
@@ -255,6 +280,7 @@ enum class DetailScreen {
     EMERGENCY_SERVICE,
     HOSPITAL_LIST,
     EDUCATIONAL,
+    SUBCATEGORY_LIST,
     SERVICE_LIST,
     EDIT_PROFILE
 }
@@ -265,10 +291,19 @@ enum class AuthScreen {
 }
 
 // State holder for service list navigation
+@Parcelize
 data class ServiceListState(
+    val categoryId: Int? = null,
+    val subcategoryId: Int? = null,
+    val categoryName: String
+) : Parcelable
+
+// State holder for subcategory list navigation
+@Parcelize
+data class SubCategoryListState(
     val categoryId: Int,
     val categoryName: String
-)
+) : Parcelable
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

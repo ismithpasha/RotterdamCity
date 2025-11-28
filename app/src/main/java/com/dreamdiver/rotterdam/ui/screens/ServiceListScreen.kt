@@ -68,24 +68,39 @@ import com.dreamdiver.rotterdam.ui.viewmodel.ServiceViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServiceListScreen(
-    categoryId: Int,
+    categoryId: Int? = null,
+    subcategoryId: Int? = null,
     categoryName: String,
     isEnglish: Boolean = true,
     onBackClick: () -> Unit = {},
     viewModel: ServiceViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var selectedService by remember { mutableStateOf<Service?>(null) }
+    val detailState by viewModel.detailState.collectAsState()
+    var selectedServiceId by remember { mutableStateOf<Int?>(null) }
 
-    LaunchedEffect(categoryId) {
-        viewModel.loadServices(categoryId, categoryName)
+    LaunchedEffect(categoryId, subcategoryId) {
+        when {
+            subcategoryId != null -> viewModel.loadServicesBySubCategory(subcategoryId)
+            categoryId != null -> viewModel.loadServices(categoryId, categoryName)
+        }
     }
 
-    // Show service detail modal if a service is selected
-    selectedService?.let { service ->
+    // Load service detail when a service is selected
+    LaunchedEffect(selectedServiceId) {
+        selectedServiceId?.let { serviceId ->
+            viewModel.loadServiceDetail(serviceId)
+        }
+    }
+
+    // Show service detail modal if service detail is loaded
+    if (detailState is com.dreamdiver.rotterdam.ui.viewmodel.ServiceDetailState.Success) {
         ServiceDetailModal(
-            service = service,
-            onDismiss = { selectedService = null }
+            serviceDetail = (detailState as com.dreamdiver.rotterdam.ui.viewmodel.ServiceDetailState.Success).serviceDetail,
+            onDismiss = {
+                selectedServiceId = null
+                viewModel.clearServiceDetail()
+            }
         )
     }
 
@@ -144,7 +159,7 @@ fun ServiceListScreen(
                         items(state.services) { service ->
                             ServiceCard(
                                 service = service,
-                                onClick = { selectedService = service }
+                                onClick = { selectedServiceId = service.id }
                             )
                         }
                     }
@@ -167,7 +182,12 @@ fun ServiceListScreen(
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { viewModel.loadServices(categoryId, categoryName) }) {
+                        Button(onClick = {
+                            when {
+                                subcategoryId != null -> viewModel.loadServicesBySubCategory(subcategoryId)
+                                categoryId != null -> viewModel.loadServices(categoryId, categoryName)
+                            }
+                        }) {
                             Text("Retry")
                         }
                     }
@@ -251,7 +271,7 @@ fun ServiceCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServiceDetailModal(
-    service: Service,
+    serviceDetail: com.dreamdiver.rotterdam.data.model.ServiceDetail,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
@@ -291,8 +311,8 @@ fun ServiceDetailModal(
 
             // Service Image
             AsyncImage(
-                model = service.image,
-                contentDescription = service.name,
+                model = serviceDetail.image,
+                contentDescription = serviceDetail.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -305,7 +325,7 @@ fun ServiceDetailModal(
 
             // Service Name
             Text(
-                text = service.name,
+                text = serviceDetail.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -316,7 +336,7 @@ fun ServiceDetailModal(
 
             // Category
             Text(
-                text = service.category.name,
+                text = serviceDetail.category.name,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium,
@@ -335,7 +355,7 @@ fun ServiceDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = service.description,
+                text = serviceDetail.description,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -344,7 +364,7 @@ fun ServiceDetailModal(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Phone Number
-            if (service.phone.isNotEmpty()) {
+            if (serviceDetail.phone.isNotEmpty()) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -378,7 +398,7 @@ fun ServiceDetailModal(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = service.phone,
+                                    text = serviceDetail.phone,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -388,7 +408,7 @@ fun ServiceDetailModal(
                         FilledTonalButton(
                             onClick = {
                                 val intent = Intent(Intent.ACTION_DIAL).apply {
-                                    data = Uri.parse("tel:${service.phone}")
+                                    data = Uri.parse("tel:${serviceDetail.phone}")
                                 }
                                 context.startActivity(intent)
                             }
@@ -407,7 +427,7 @@ fun ServiceDetailModal(
             }
 
             // Address
-            if (service.address.isNotEmpty()) {
+            if (serviceDetail.address.isNotEmpty()) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -436,7 +456,7 @@ fun ServiceDetailModal(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = service.address,
+                                text = serviceDetail.address,
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
@@ -447,18 +467,18 @@ fun ServiceDetailModal(
             }
 
             // Google Maps Button (if lat/lng or URL available)
-            val hasLocation = (!service.latitude.isNullOrEmpty() && !service.longitude.isNullOrEmpty())
-                           || !service.googleMapsUrl.isNullOrEmpty()
+            val hasLocation = (!serviceDetail.latitude.isNullOrEmpty() && !serviceDetail.longitude.isNullOrEmpty())
+                           || !serviceDetail.googleMapsUrl.isNullOrEmpty()
 
             if (hasLocation) {
                 OutlinedButton(
                     onClick = {
-                        val mapUri = if (!service.latitude.isNullOrEmpty() && !service.longitude.isNullOrEmpty()) {
+                        val mapUri = if (!serviceDetail.latitude.isNullOrEmpty() && !serviceDetail.longitude.isNullOrEmpty()) {
                             // Use lat/lng if available
-                            "geo:${service.latitude},${service.longitude}?q=${service.latitude},${service.longitude}(${service.name})"
+                            "geo:${serviceDetail.latitude},${serviceDetail.longitude}?q=${serviceDetail.latitude},${serviceDetail.longitude}(${serviceDetail.name})"
                         } else {
                             // Fallback to google maps URL
-                            service.googleMapsUrl ?: ""
+                            serviceDetail.googleMapsUrl ?: ""
                         }
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUri))
                         context.startActivity(intent)

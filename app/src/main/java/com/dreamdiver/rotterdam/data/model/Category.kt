@@ -71,3 +71,30 @@ data class Service(
     val updatedAt: String
 )
 
+data class ServiceDetailResponse(
+    val success: Boolean,
+    val data: ServiceDetail,
+    val message: String
+)
+
+data class ServiceDetail(
+    val id: Int,
+    @SerializedName("category_id")
+    val categoryId: Int,
+    val category: Category,
+    val name: String,
+    val phone: String,
+    val address: String,
+    val latitude: String?,
+    val longitude: String?,
+    @SerializedName("google_maps_url")
+    val googleMapsUrl: String?,
+    val description: String,
+    val image: String,
+    val status: String,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("updated_at")
+    val updatedAt: String
+)
+

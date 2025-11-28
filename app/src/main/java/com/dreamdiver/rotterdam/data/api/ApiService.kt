@@ -5,8 +5,11 @@ import com.dreamdiver.rotterdam.data.model.CategoryResponse
 import com.dreamdiver.rotterdam.data.model.LoginRequest
 import com.dreamdiver.rotterdam.data.model.ProfileUpdateResponse
 import com.dreamdiver.rotterdam.data.model.RegisterRequest
+import com.dreamdiver.rotterdam.data.model.ServiceDetailResponse
 import com.dreamdiver.rotterdam.data.model.ServiceResponse
 import com.dreamdiver.rotterdam.data.model.SliderResponse
+import com.dreamdiver.rotterdam.data.model.SubCategoryResponse
+import com.dreamdiver.rotterdam.data.model.SubCategoryServiceResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -18,8 +21,17 @@ interface ApiService {
     @GET("api/v1/sliders")
     suspend fun getSliders(): SliderResponse
 
+    @GET("api/v1/subcategories/category/{categoryId}")
+    suspend fun getSubCategories(@Path("categoryId") categoryId: Int): SubCategoryResponse
+
+    @GET("api/v1/subcategories/{subcategoryId}/services")
+    suspend fun getServicesBySubCategory(@Path("subcategoryId") subcategoryId: Int): SubCategoryServiceResponse
+
     @GET("api/v1/services")
     suspend fun getServices(@Query("category_id") categoryId: Int): ServiceResponse
+
+    @GET("api/v1/services/{serviceId}")
+    suspend fun getServiceById(@Path("serviceId") serviceId: Int): ServiceDetailResponse
 
     @POST("api/v1/auth/register")
     suspend fun register(@Body request: RegisterRequest): AuthResponse
