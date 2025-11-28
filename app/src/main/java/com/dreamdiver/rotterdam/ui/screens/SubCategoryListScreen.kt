@@ -96,7 +96,7 @@ fun SubCategoryListScreen(
             }
             is SubCategoryUiState.Success -> {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding),
@@ -169,18 +169,18 @@ fun SubCategoryCard(
                 AsyncImage(
                     model = subCategory.iconUrl,
                     contentDescription = subCategory.name,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Fit
                 )
             } else {
                 // Placeholder icon if no icon URL
                 Box(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(64.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = subCategory.name.take(2).uppercase(),
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )

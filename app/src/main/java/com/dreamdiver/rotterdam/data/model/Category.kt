@@ -63,6 +63,7 @@ data class Service(
     @SerializedName("google_maps_url")
     val googleMapsUrl: String?,
     val description: String,
+    @SerializedName("image_url")
     val image: String,
     val status: String,
     @SerializedName("created_at")
@@ -90,6 +91,7 @@ data class ServiceDetail(
     @SerializedName("google_maps_url")
     val googleMapsUrl: String?,
     val description: String,
+    @SerializedName("image_url")
     val image: String,
     val status: String,
     @SerializedName("created_at")
