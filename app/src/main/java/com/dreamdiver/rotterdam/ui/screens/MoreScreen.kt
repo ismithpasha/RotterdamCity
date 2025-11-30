@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.dreamdiver.rotterdam.util.Strings
 
 @Composable
 fun MoreScreen(
@@ -53,7 +54,7 @@ fun MoreScreen(
     ) {
         // Header
         Text(
-            text = if (isEnglish) "More Options" else "আরও অপশন",
+            text = Strings.moreOptions(isEnglish),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(16.dp)
@@ -68,7 +69,7 @@ fun MoreScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = if (isEnglish) "Language Settings" else "ভাষা সেটিংস",
+                    text = Strings.languageSettings(isEnglish),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -77,8 +78,8 @@ fun MoreScreen(
 
                 MoreOptionItem(
                     icon = Icons.Default.Language,
-                    title = if (isEnglish) "Change Language" else "ভাষা পরিবর্তন করুন",
-                    subtitle = if (isEnglish) "English / বাংলা" else "ইংরেজি / বাংলা",
+                    title = Strings.changeLanguage(isEnglish),
+                    subtitle = Strings.englishDutch(isEnglish),
                     showSwitch = true,
                     switchChecked = isEnglish,
                     onSwitchChanged = { onLanguageChange(it) },
@@ -98,7 +99,7 @@ fun MoreScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = if (isEnglish) "Information" else "তথ্য",
+                    text = Strings.information(isEnglish),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -107,16 +108,16 @@ fun MoreScreen(
 
                 MoreOptionItem(
                     icon = Icons.Default.Notifications,
-                    title = if (isEnglish) "Notice" else "নোটিশ",
-                    subtitle = if (isEnglish) "View important notices" else "গুরুত্বপূর্ণ নোটিশ দেখুন",
+                    title = Strings.notice(isEnglish),
+                    subtitle = Strings.viewImportantNotices(isEnglish),
                     onClick = onNavigateToNotice
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 MoreOptionItem(
                     icon = Icons.Default.Info,
-                    title = if (isEnglish) "About Us" else "আমাদের সম্পর্কে",
-                    subtitle = if (isEnglish) "Learn about Rotterdam City" else "রটারডাম সিটি সম্পর্কে জানুন",
+                    title = Strings.aboutUs(isEnglish),
+                    subtitle = Strings.learnAbout(isEnglish),
                     onClick = onNavigateToAbout
                 )
             }
@@ -133,7 +134,7 @@ fun MoreScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = if (isEnglish) "Legal" else "আইনি",
+                    text = Strings.legal(isEnglish),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -142,16 +143,16 @@ fun MoreScreen(
 
                 MoreOptionItem(
                     icon = Icons.Default.PrivacyTip,
-                    title = if (isEnglish) "Privacy Policy" else "গোপনীয়তা নীতি",
-                    subtitle = if (isEnglish) "How we handle your data" else "আমরা আপনার ডেটা কীভাবে পরিচালনা করি",
+                    title = Strings.privacyPolicy(isEnglish),
+                    subtitle = Strings.howWeHandleData(isEnglish),
                     onClick = onNavigateToPrivacy
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 MoreOptionItem(
                     icon = Icons.AutoMirrored.Filled.Article,
-                    title = if (isEnglish) "Terms & Conditions" else "শর্তাবলী",
-                    subtitle = if (isEnglish) "Terms of service" else "সেবার শর্তাবলী",
+                    title = Strings.termsConditions(isEnglish),
+                    subtitle = Strings.termsOfService(isEnglish),
                     onClick = onNavigateToTerms
                 )
             }
@@ -168,7 +169,7 @@ fun MoreScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = if (isEnglish) "Other" else "অন্যান্য",
+                    text = Strings.other(isEnglish),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -177,16 +178,16 @@ fun MoreScreen(
 
                 MoreOptionItem(
                     icon = Icons.Default.Star,
-                    title = if (isEnglish) "Rate Us" else "রেট করুন",
-                    subtitle = if (isEnglish) "Rate on Play Store" else "প্লে স্টোরে রেট করুন",
+                    title = Strings.rateUs(isEnglish),
+                    subtitle = Strings.rateOnPlayStore(isEnglish),
                     onClick = { /* Open Play Store */ }
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 MoreOptionItem(
                     icon = Icons.Default.Share,
-                    title = if (isEnglish) "Share App" else "অ্যাপ শেয়ার করুন",
-                    subtitle = if (isEnglish) "Share with friends" else "বন্ধুদের সাথে শেয়ার করুন",
+                    title = Strings.shareApp(isEnglish),
+                    subtitle = Strings.shareWithFriends(isEnglish),
                     onClick = { /* Share app */ }
                 )
             }
@@ -194,7 +195,7 @@ fun MoreScreen(
 
         // App Version
         Text(
-            text = if (isEnglish) "Version 1.0.0" else "সংস্করণ ১.০.০",
+            text = Strings.version(isEnglish),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             modifier = Modifier

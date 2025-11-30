@@ -97,7 +97,7 @@ class AuthRepository {
             val skillCategoryPart = skillCategory?.toRequestBody("text/plain".toMediaTypeOrNull())
 
             // Convert skills list to List<RequestBody> for Laravel array format (skills[])
-            val skillsParts = skills?.map { skill ->
+            val skillsParts: List<okhttp3.RequestBody>? = skills?.map { skill ->
                 skill.toRequestBody("text/plain".toMediaTypeOrNull())
             }
 
@@ -106,7 +106,7 @@ class AuthRepository {
             val experienceYearsPart = experienceYears?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
 
             // Convert certifications list to List<RequestBody> for Laravel array format (certifications[])
-            val certificationsParts = certifications?.map { cert ->
+            val certificationsParts: List<okhttp3.RequestBody>? = certifications?.map { cert ->
                 cert.toRequestBody("text/plain".toMediaTypeOrNull())
             }
 

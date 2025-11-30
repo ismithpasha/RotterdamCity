@@ -48,6 +48,7 @@ import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
 import com.dreamdiver.rotterdam.ui.viewmodel.AuthViewModel
 import com.dreamdiver.rotterdam.util.Strings
+import com.dreamdiver.rotterdam.data.api.RetrofitInstance
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -56,6 +57,10 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize RetrofitInstance with context for language support
+        RetrofitInstance.init(applicationContext)
+
         preferencesManager = PreferencesManager(applicationContext)
         authViewModel = AuthViewModel(preferencesManager = preferencesManager)
         enableEdgeToEdge()

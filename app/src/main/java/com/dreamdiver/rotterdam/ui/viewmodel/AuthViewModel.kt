@@ -65,15 +65,25 @@ class AuthViewModel(
                 onSuccess = { response ->
                     if (response.success && response.data != null && response.data.user != null) {
                         // Save user data
+                        val user = response.data.user
                         preferencesManager.saveUserData(
                             token = response.data.token,
-                            userId = response.data.user.id,
-                            userName = response.data.user.name,
-                            userEmail = response.data.user.email,
-                            userType = response.data.user.userType,
-                            userPhone = response.data.user.phone,
-                            userCity = response.data.user.city,
-                            userAvatar = response.data.user.avatar
+                            userId = user.id,
+                            userName = user.name,
+                            userEmail = user.email,
+                            userType = user.userType,
+                            userPhone = user.phone,
+                            userCity = user.city,
+                            userAvatar = user.avatar,
+                            userAddress = user.address,
+                            userState = user.state,
+                            userZipCode = user.zipCode,
+                            userBio = user.profile?.bio,
+                            userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
+                            userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
+                            userExperienceYears = user.profile?.experienceYears,
+                            userSkills = user.profile?.skills,
+                            userCertifications = user.profile?.certifications
                         )
                         _authState.value = AuthState.Success(response.message)
                     } else {
@@ -97,15 +107,25 @@ class AuthViewModel(
                 onSuccess = { response ->
                     if (response.success && response.data != null && response.data.user != null) {
                         // Save user data
+                        val user = response.data.user
                         preferencesManager.saveUserData(
                             token = response.data.token,
-                            userId = response.data.user.id,
-                            userName = response.data.user.name,
-                            userEmail = response.data.user.email,
-                            userType = response.data.user.userType,
-                            userPhone = response.data.user.phone,
-                            userCity = response.data.user.city,
-                            userAvatar = response.data.user.avatar
+                            userId = user.id,
+                            userName = user.name,
+                            userEmail = user.email,
+                            userType = user.userType,
+                            userPhone = user.phone,
+                            userCity = user.city,
+                            userAvatar = user.avatar,
+                            userAddress = user.address,
+                            userState = user.state,
+                            userZipCode = user.zipCode,
+                            userBio = user.profile?.bio,
+                            userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
+                            userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
+                            userExperienceYears = user.profile?.experienceYears,
+                            userSkills = user.profile?.skills,
+                            userCertifications = user.profile?.certifications
                         )
                         _authState.value = AuthState.Success(response.message)
                     } else {
@@ -136,15 +156,27 @@ class AuthViewModel(
                 onSuccess = { response ->
                     if (response.success && response.data != null && response.data.user != null) {
                         // Update local user data with fresh data from server
+                        val user = response.data.user
                         preferencesManager.saveUserData(
                             token = token,
-                            userId = response.data.user.id,
-                            userName = response.data.user.name,
-                            userEmail = response.data.user.email,
-                            userType = response.data.user.userType,
-                            userPhone = response.data.user.phone,
-                            userCity = response.data.user.city,
-                            userAvatar = response.data.avatarUrl ?: response.data.user.avatar
+                            userId = user.id,
+                            userName = user.name,
+                            userEmail = user.email,
+                            userType = user.userType,
+                            userPhone = user.phone,
+                            userCity = user.city,
+                            userAvatar = response.data.avatarUrl ?: user.avatar,
+                            userAddress = user.address,
+                            userState = user.state,
+                            userZipCode = user.zipCode,
+                            userBio = user.profile?.bio,
+                            userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
+                            userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
+                            userExperienceYears = user.profile?.experienceYears,
+                            userSkills = user.profile?.skills,
+                            userCertifications = user.profile?.certifications,
+                            userAverageRating = response.data.averageRating,
+                            userTotalRatings = response.data.totalRatings
                         )
                         _authState.value = AuthState.Success(response.message ?: "Profile fetched successfully")
                     } else {
@@ -205,15 +237,27 @@ class AuthViewModel(
                 onSuccess = { response ->
                     if (response.success && response.data != null && response.data.user != null) {
                         // Update saved user data
+                        val user = response.data.user
                         preferencesManager.saveUserData(
                             token = token,
-                            userId = response.data.user.id,
-                            userName = response.data.user.name,
-                            userEmail = response.data.user.email,
-                            userType = response.data.user.userType,
-                            userPhone = response.data.user.phone,
-                            userCity = response.data.user.city,
-                            userAvatar = response.data.avatarUrl ?: response.data.user.avatar
+                            userId = user.id,
+                            userName = user.name,
+                            userEmail = user.email,
+                            userType = user.userType,
+                            userPhone = user.phone,
+                            userCity = user.city,
+                            userAvatar = response.data.avatarUrl ?: user.avatar,
+                            userAddress = user.address,
+                            userState = user.state,
+                            userZipCode = user.zipCode,
+                            userBio = user.profile?.bio,
+                            userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
+                            userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
+                            userExperienceYears = user.profile?.experienceYears,
+                            userSkills = user.profile?.skills,
+                            userCertifications = user.profile?.certifications,
+                            userAverageRating = response.data.averageRating,
+                            userTotalRatings = response.data.totalRatings
                         )
                         _authState.value = AuthState.Success(response.message ?: "Profile updated successfully")
                     } else {

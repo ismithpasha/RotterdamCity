@@ -40,6 +40,17 @@ fun ProfileScreen(
     var userPhone by remember { mutableStateOf("") }
     var userCity by remember { mutableStateOf("") }
     var userAvatar by remember { mutableStateOf<String?>(null) }
+    var userAddress by remember { mutableStateOf("") }
+    var userState by remember { mutableStateOf("") }
+    var userZipCode by remember { mutableStateOf("") }
+    var userBio by remember { mutableStateOf("") }
+    var userSkillCategory by remember { mutableStateOf("") }
+    var userHourlyRate by remember { mutableStateOf("") }
+    var userExperienceYears by remember { mutableStateOf<Int?>(null) }
+    var userSkills by remember { mutableStateOf<List<String>>(emptyList()) }
+    var userCertifications by remember { mutableStateOf<List<String>>(emptyList()) }
+    var userAverageRating by remember { mutableStateOf("") }
+    var userTotalRatings by remember { mutableStateOf<Int?>(null) }
     var authToken by remember { mutableStateOf("") }
 
     // Function to load user data
@@ -51,6 +62,19 @@ fun ProfileScreen(
             userPhone = preferencesManager.userPhone.first() ?: ""
             userCity = preferencesManager.userCity.first() ?: ""
             userAvatar = preferencesManager.userAvatar.first()
+            userAddress = preferencesManager.userAddress.first() ?: ""
+            userState = preferencesManager.userState.first() ?: ""
+            userZipCode = preferencesManager.userZipCode.first() ?: ""
+            userBio = preferencesManager.userBio.first() ?: ""
+            userSkillCategory = preferencesManager.userSkillCategory.first() ?: ""
+            userHourlyRate = preferencesManager.userHourlyRate.first() ?: ""
+            userExperienceYears = preferencesManager.userExperienceYears.first()
+            val skillsString = preferencesManager.userSkills.first() ?: ""
+            userSkills = if (skillsString.isNotBlank()) skillsString.split(",") else emptyList()
+            val certificationsString = preferencesManager.userCertifications.first() ?: ""
+            userCertifications = if (certificationsString.isNotBlank()) certificationsString.split(",") else emptyList()
+            userAverageRating = preferencesManager.userAverageRating.first() ?: ""
+            userTotalRatings = preferencesManager.userTotalRatings.first()
             authToken = preferencesManager.authToken.first() ?: ""
         }
     }
@@ -175,6 +199,16 @@ fun ProfileScreen(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
 
+            // Address
+            if (userAddress.isNotBlank()) {
+                ProfileInfoItem(
+                    icon = Icons.Default.Home,
+                    label = if (isEnglish) "Address" else "Adres",
+                    value = userAddress
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
             // City
             if (userCity.isNotBlank()) {
                 ProfileInfoItem(
@@ -185,12 +219,172 @@ fun ProfileScreen(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
 
+            // State
+            if (userState.isNotBlank()) {
+                ProfileInfoItem(
+                    icon = Icons.Default.LocationCity,
+                    label = if (isEnglish) "State" else "Staat",
+                    value = userState
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
+            // Zip Code
+            if (userZipCode.isNotBlank()) {
+                ProfileInfoItem(
+                    icon = Icons.Default.Numbers,
+                    label = if (isEnglish) "Zip Code" else "Postcode",
+                    value = userZipCode
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            }
+
             // Account Type
             ProfileInfoItem(
                 icon = Icons.Default.AccountBox,
                 label = if (isEnglish) "Account Type" else "Accounttype",
                 value = userType.replaceFirstChar { it.uppercase() }
             )
+
+            // Worker-specific fields
+            if (userType.lowercase() == "worker") {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = if (isEnglish) "Professional Information" else "Professionele Informatie",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+
+                // Skill Category
+                if (userSkillCategory.isNotBlank()) {
+                    ProfileInfoItem(
+                        icon = Icons.Default.Work,
+                        label = if (isEnglish) "Skill Category" else "Vaardigheid Categorie",
+                        value = userSkillCategory.replaceFirstChar { it.uppercase() }
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Hourly Rate
+                if (userHourlyRate.isNotBlank()) {
+                    ProfileInfoItem(
+                        icon = Icons.Default.AttachMoney,
+                        label = if (isEnglish) "Hourly Rate" else "Uurtarief",
+                        value = "€${userHourlyRate}"
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Experience Years
+                userExperienceYears?.let { years ->
+                    ProfileInfoItem(
+                        icon = Icons.Default.Timeline,
+                        label = if (isEnglish) "Experience" else "Ervaring",
+                        value = if (isEnglish) "$years years" else "$years jaar"
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Rating
+                if (userAverageRating.isNotBlank()) {
+                    val ratingText = if (userTotalRatings != null && userTotalRatings!! > 0) {
+                        "$userAverageRating ⭐ ($userTotalRatings ${if (isEnglish) "ratings" else "beoordelingen"})"
+                    } else {
+                        if (isEnglish) "No ratings yet" else "Nog geen beoordelingen"
+                    }
+                    ProfileInfoItem(
+                        icon = Icons.Default.Star,
+                        label = if (isEnglish) "Rating" else "Beoordeling",
+                        value = ratingText
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Bio
+                if (userBio.isNotBlank()) {
+                    ProfileInfoItem(
+                        icon = Icons.Default.Description,
+                        label = if (isEnglish) "Bio" else "Bio",
+                        value = userBio
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Skills
+                if (userSkills.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.Top) {
+                            Icon(
+                                imageVector = Icons.Default.Build,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isEnglish) "Skills" else "Vaardigheden",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                userSkills.forEach { skill ->
+                                    Text(
+                                        text = "• $skill",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                }
+
+                // Certifications
+                if (userCertifications.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.Top) {
+                            Icon(
+                                imageVector = Icons.Default.CardMembership,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isEnglish) "Certifications" else "Certificaten",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                userCertifications.forEach { cert ->
+                                    Text(
+                                        text = "• $cert",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(vertical = 2.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 

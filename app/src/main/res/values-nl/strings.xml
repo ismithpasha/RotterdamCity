@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rotterdam City</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Thuis</string>
+    <string name="nav_favorites">Favorieten</string>
+    <string name="nav_profile">Profiel</string>
+    <string name="nav_more">Meer</string>
+
+    <!-- Common -->
+    <string name="loading">Laden...</string>
+    <string name="error_loading">Fout bij laden</string>
+    <string name="retry">Opnieuw proberen</string>
+    <string name="back">Terug</string>
+    <string name="save">Opslaan</string>
+    <string name="cancel">Annuleren</string>
+    <string name="ok">OK</string>
+    <string name="search">Zoeken</string>
+    <string name="no_data">Geen gegevens beschikbaar</string>
+
+    <!-- Auth -->
+    <string name="login">Inloggen</string>
+    <string name="register">Registreren</string>
+    <string name="logout">Uitloggen</string>
+    <string name="email">E-mail</string>
+    <string name="password">Wachtwoord</string>
+    <string name="name">Naam</string>
+    <string name="phone">Telefoon</string>
+    <string name="confirm_password">Wachtwoord bevestigen</string>
+    <string name="forgot_password">Wachtwoord vergeten?</string>
+    <string name="dont_have_account">Heb je geen account?</string>
+    <string name="already_have_account">Heb je al een account?</string>
+
+    <!-- Profile -->
+    <string name="edit_profile">Profiel bewerken</string>
+    <string name="my_profile">Mijn Profiel</string>
+    <string name="address">Adres</string>
+    <string name="city">Stad</string>
+    <string name="state">Provincie</string>
+    <string name="zip_code">Postcode</string>
+    <string name="bio">Bio</string>
+
+    <!-- More Screen -->
+    <string name="more_options">Meer Opties</string>
+    <string name="language_settings">Taalinstellingen</string>
+    <string name="change_language">Taal Wijzigen</string>
+    <string name="english_dutch">Engels / Nederlands</string>
+    <string name="information">Informatie</string>
+    <string name="notice">Kennisgeving</string>
+    <string name="view_important_notices">Belangrijke kennisgevingen bekijken</string>
+    <string name="about_us">Over Ons</string>
+    <string name="learn_about">Leer meer over Rotterdam City</string>
+    <string name="legal">Juridisch</string>
+    <string name="privacy_policy">Privacybeleid</string>
+    <string name="how_we_handle_data">Hoe we uw gegevens verwerken</string>
+    <string name="terms_conditions">Algemene Voorwaarden</string>
+    <string name="terms_of_service">Servicevoorwaarden</string>
+    <string name="other">Overig</string>
+    <string name="rate_us">Beoordeel Ons</string>
+    <string name="rate_on_play_store">Beoordeel op Play Store</string>
+    <string name="share_app">App Delen</string>
+    <string name="share_with_friends">Deel met vrienden</string>
+    <string name="version">Versie 1.0.0</string>
+
+    <!-- Categories -->
+    <string name="emergency_services">Nooddiensten</string>
+    <string name="hospital">Ziekenhuis</string>
+    <string name="doctor">Dokter</string>
+    <string name="ambulance">Ambulance</string>
+    <string name="fire_service">Brandweer</string>
+    <string name="police_station">Politiebureau</string>
+    <string name="blood_donor">Bloeddonor</string>
+
+    <!-- Services -->
+    <string name="services">Diensten</string>
+    <string name="all_services">Alle Diensten</string>
+    <string name="view_on_map">Bekijken op kaart</string>
+    <string name="call">Bellen</string>
+    <string name="description">Beschrijving</string>
+    <string name="contact_info">Contactgegevens</string>
+
+    <!-- Home -->
+    <string name="welcome">Welkom</string>
+    <string name="explore_services">Ontdek Diensten</string>
+    <string name="categories">Categorieën</string>
+</resources>
+

@@ -62,6 +62,7 @@ fun EditProfileScreen(
     var userType by remember { mutableStateOf("") }
     var token by remember { mutableStateOf("") }
     var avatarUri by remember { mutableStateOf<Uri?>(null) }
+    var existingAvatarUrl by remember { mutableStateOf<String?>(null) }
 
     // Worker-specific fields
     var skillCategory by remember { mutableStateOf("") }
@@ -95,8 +96,28 @@ fun EditProfileScreen(
             name = preferencesManager.userName.first() ?: ""
             phone = preferencesManager.userPhone.first() ?: ""
             city = preferencesManager.userCity.first() ?: ""
+            address = preferencesManager.userAddress.first() ?: ""
+            state = preferencesManager.userState.first() ?: ""
+            zipCode = preferencesManager.userZipCode.first() ?: ""
             userType = preferencesManager.userType.first() ?: ""
             token = preferencesManager.authToken.first() ?: ""
+            existingAvatarUrl = preferencesManager.userAvatar.first()
+
+            // Load worker-specific fields if user is a worker
+            if (userType == "worker") {
+                skillCategory = preferencesManager.userSkillCategory.first() ?: ""
+                bio = preferencesManager.userBio.first() ?: ""
+                hourlyRate = preferencesManager.userHourlyRate.first() ?: ""
+                experienceYears = preferencesManager.userExperienceYears.first()?.toString() ?: ""
+
+                // Load skills
+                val skillsString = preferencesManager.userSkills.first() ?: ""
+                skillsText = if (skillsString.isNotBlank()) skillsString else ""
+
+                // Load certifications
+                val certificationsString = preferencesManager.userCertifications.first() ?: ""
+                certificationsText = if (certificationsString.isNotBlank()) certificationsString else ""
+            }
         }
     }
 
@@ -147,6 +168,13 @@ fun EditProfileScreen(
                         AsyncImage(
                             model = avatarUri,
                             contentDescription = "Avatar",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else if (!existingAvatarUrl.isNullOrBlank()) {
+                        AsyncImage(
+                            model = existingAvatarUrl,
+                            contentDescription = "Current Avatar",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
@@ -437,22 +465,23 @@ fun EditProfileScreen(
                             uriToFile(context, uri)
                         }
 
-                        val skillsList = if (skillsText.isNotBlank()) {
+                        val skillsList: List<String>? = if (skillsText.isNotBlank()) {
                             skillsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         } else null
 
-                        val certsList = if (certificationsText.isNotBlank()) {
+                        val certsList: List<String>? = if (certificationsText.isNotBlank()) {
                             certificationsText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
                         } else null
 
-                        val availabilityMap = mutableMapOf<String, String>()
-                        if (mondayAvail.isNotBlank()) availabilityMap["monday"] = mondayAvail
-                        if (tuesdayAvail.isNotBlank()) availabilityMap["tuesday"] = tuesdayAvail
-                        if (wednesdayAvail.isNotBlank()) availabilityMap["wednesday"] = wednesdayAvail
-                        if (thursdayAvail.isNotBlank()) availabilityMap["thursday"] = thursdayAvail
-                        if (fridayAvail.isNotBlank()) availabilityMap["friday"] = fridayAvail
-                        if (saturdayAvail.isNotBlank()) availabilityMap["saturday"] = saturdayAvail
-                        if (sundayAvail.isNotBlank()) availabilityMap["sunday"] = sundayAvail
+                        val availabilityMap: Map<String, String> = buildMap {
+                            if (mondayAvail.isNotBlank()) put("monday", mondayAvail)
+                            if (tuesdayAvail.isNotBlank()) put("tuesday", tuesdayAvail)
+                            if (wednesdayAvail.isNotBlank()) put("wednesday", wednesdayAvail)
+                            if (thursdayAvail.isNotBlank()) put("thursday", thursdayAvail)
+                            if (fridayAvail.isNotBlank()) put("friday", fridayAvail)
+                            if (saturdayAvail.isNotBlank()) put("saturday", saturdayAvail)
+                            if (sundayAvail.isNotBlank()) put("sunday", sundayAvail)
+                        }
 
                         viewModel.updateProfile(
                             token = token,
