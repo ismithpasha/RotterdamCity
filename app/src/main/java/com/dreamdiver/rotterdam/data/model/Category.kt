@@ -14,6 +14,7 @@ data class Category(
     val name: String,
     @SerializedName("name_en")
     val nameEn: String? = null,
+    @SerializedName("icon_url")
     val icon: String,
     val status: String,
     @SerializedName("services_count")

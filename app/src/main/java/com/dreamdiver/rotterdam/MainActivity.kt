@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dreamdiver.rotterdam.data.PreferencesManager
 import com.dreamdiver.rotterdam.ui.screens.AboutUsScreen
 import com.dreamdiver.rotterdam.ui.screens.EducationalScreen
@@ -47,6 +49,7 @@ import com.dreamdiver.rotterdam.ui.screens.SubCategoryListScreen
 import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
 import com.dreamdiver.rotterdam.ui.viewmodel.AuthViewModel
+import com.dreamdiver.rotterdam.ui.viewmodel.HomeViewModel
 import com.dreamdiver.rotterdam.util.Strings
 import com.dreamdiver.rotterdam.data.api.RetrofitInstance
 import kotlinx.coroutines.launch
@@ -98,6 +101,16 @@ fun CumillaCityApp(
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
     var subcategoryListState by rememberSaveable { mutableStateOf<SubCategoryListState?>(null) }
     var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(if (!isLoggedIn) AuthScreen.LOGIN else null) }
+
+    // Create a shared HomeViewModel to manage home screen state
+    val homeViewModel: HomeViewModel = viewModel()
+
+    // Reload home data whenever returning to HOME destination
+    LaunchedEffect(currentDestination) {
+        if (currentDestination == AppDestinations.HOME) {
+            homeViewModel.loadCategories()
+        }
+    }
 
     // Show auth screens if not logged in
     if (!isLoggedIn && showAuthScreen != null && authViewModel != null) {
@@ -226,7 +239,8 @@ fun CumillaCityApp(
                         onNavigateToServiceList = { categoryId, categoryName ->
                             subcategoryListState = SubCategoryListState(categoryId, categoryName)
                             currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
-                        }
+                        },
+                        viewModel = homeViewModel
                     )
                     AppDestinations.FAVORITES -> FavoritesScreen(
                         modifier = Modifier.padding(innerPadding)

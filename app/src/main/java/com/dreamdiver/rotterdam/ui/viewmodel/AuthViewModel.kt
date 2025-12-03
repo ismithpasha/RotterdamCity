@@ -1,5 +1,6 @@
 package com.dreamdiver.rotterdam.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dreamdiver.rotterdam.data.PreferencesManager
@@ -99,43 +100,79 @@ class AuthViewModel(
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
+            try {
+                Log.d("AuthViewModel", "Login attempt for email: $email")
+                _authState.value = AuthState.Loading
 
-            val result = repository.login(email, password)
-
-            result.fold(
-                onSuccess = { response ->
-                    if (response.success && response.data != null && response.data.user != null) {
-                        // Save user data
-                        val user = response.data.user
-                        preferencesManager.saveUserData(
-                            token = response.data.token,
-                            userId = user.id,
-                            userName = user.name,
-                            userEmail = user.email,
-                            userType = user.userType,
-                            userPhone = user.phone,
-                            userCity = user.city,
-                            userAvatar = user.avatar,
-                            userAddress = user.address,
-                            userState = user.state,
-                            userZipCode = user.zipCode,
-                            userBio = user.profile?.bio,
-                            userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
-                            userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
-                            userExperienceYears = user.profile?.experienceYears,
-                            userSkills = user.profile?.skills,
-                            userCertifications = user.profile?.certifications
-                        )
-                        _authState.value = AuthState.Success(response.message)
-                    } else {
-                        _authState.value = AuthState.Error(response.message)
-                    }
-                },
-                onFailure = { exception ->
-                    _authState.value = AuthState.Error(exception.message ?: "Login failed")
+                // Validate inputs
+                if (email.isBlank() || password.isBlank()) {
+                    _authState.value = AuthState.Error("Email and password are required")
+                    return@launch
                 }
-            )
+
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    _authState.value = AuthState.Error("Please enter a valid email address")
+                    return@launch
+                }
+
+                val result = repository.login(email, password)
+
+                result.fold(
+                    onSuccess = { response ->
+                        Log.d("AuthViewModel", "Login response: success=${response.success}, message=${response.message}")
+
+                        if (response.success && response.data != null && response.data.user != null) {
+                            // Save user data
+                            val user = response.data.user
+                            preferencesManager.saveUserData(
+                                token = response.data.token,
+                                userId = user.id,
+                                userName = user.name,
+                                userEmail = user.email,
+                                userType = user.userType,
+                                userPhone = user.phone,
+                                userCity = user.city,
+                                userAvatar = user.avatar,
+                                userAddress = user.address,
+                                userState = user.state,
+                                userZipCode = user.zipCode,
+                                userBio = user.profile?.bio,
+                                userSkillCategory = user.skillCategory ?: user.profile?.skillCategory,
+                                userHourlyRate = user.hourlyRate ?: user.profile?.hourlyRate,
+                                userExperienceYears = user.profile?.experienceYears,
+                                userSkills = user.profile?.skills,
+                                userCertifications = user.profile?.certifications
+                            )
+                            Log.d("AuthViewModel", "User data saved successfully")
+                            _authState.value = AuthState.Success(response.message)
+                        } else {
+                            val errorMsg = response.message.ifBlank { "Login failed. Please try again." }
+                            Log.e("AuthViewModel", "Login failed: $errorMsg")
+                            _authState.value = AuthState.Error(errorMsg)
+                        }
+                    },
+                    onFailure = { exception ->
+                        val errorMessage = when {
+                            exception.message?.contains("500") == true ->
+                                "Server error (500). Please check your credentials and try again."
+                            exception.message?.contains("404") == true ->
+                                "Service not found. Please contact support."
+                            exception.message?.contains("401") == true || exception.message?.contains("403") == true ->
+                                "Invalid email or password"
+                            exception.message?.contains("timeout") == true ->
+                                "Connection timeout. Please check your internet connection."
+                            exception.message?.contains("Unable to resolve host") == true ->
+                                "Cannot connect to server. Please check your internet connection."
+                            else -> exception.message ?: "Login failed. Please try again."
+                        }
+                        Log.e("AuthViewModel", "Login error: ${exception.message}", exception)
+                        _authState.value = AuthState.Error(errorMessage)
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Unexpected login error: ${e.message}", e)
+                _authState.value = AuthState.Error("An unexpected error occurred: ${e.message}")
+            }
         }
     }
 
@@ -278,4 +315,3 @@ class AuthViewModel(
         _authState.value = AuthState.Idle
     }
 }
-

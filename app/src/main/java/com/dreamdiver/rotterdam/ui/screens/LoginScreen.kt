@@ -41,6 +41,8 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
     val focusManager = LocalFocusManager.current
 
     val authState by viewModel.authState.collectAsState()
@@ -94,11 +96,16 @@ fun LoginScreen(
             // Email Field
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = {
+                    email = it
+                    emailError = null
+                },
                 label = { Text(if (isEnglish) "Email" else "E-mail") },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                isError = emailError != null,
+                supportingText = emailError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
@@ -113,7 +120,10 @@ fun LoginScreen(
             // Password Field
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    password = it
+                    passwordError = null
+                },
                 label = { Text(if (isEnglish) "Password" else "Wachtwoord") },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
@@ -127,6 +137,8 @@ fun LoginScreen(
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                isError = passwordError != null,
+                supportingText = passwordError?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
@@ -140,19 +152,47 @@ fun LoginScreen(
 
             // Error Message
             if (authState is AuthState.Error) {
-                Text(
-                    text = (authState as AuthState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = (authState as AuthState.Error).message,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
 
             // Login Button
             Button(
                 onClick = {
-                    if (email.isNotBlank() && password.isNotBlank()) {
-                        viewModel.login(email, password)
+                    // Validate inputs
+                    var hasError = false
+
+                    if (email.isBlank()) {
+                        emailError = if (isEnglish) "Email is required" else "E-mail is verplicht"
+                        hasError = true
+                    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        emailError = if (isEnglish) "Invalid email format" else "Ongeldig e-mailformaat"
+                        hasError = true
+                    }
+
+                    if (password.isBlank()) {
+                        passwordError = if (isEnglish) "Password is required" else "Wachtwoord is verplicht"
+                        hasError = true
+                    } else if (password.length < 6) {
+                        passwordError = if (isEnglish) "Password must be at least 6 characters" else "Wachtwoord moet minimaal 6 tekens zijn"
+                        hasError = true
+                    }
+
+                    if (!hasError) {
+                        viewModel.login(email.trim(), password)
                     }
                 },
                 modifier = Modifier
@@ -196,4 +236,3 @@ fun LoginScreen(
         }
     }
 }
-
