@@ -78,7 +78,7 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(280.dp)
+                .height(120.dp)
         ) {
             // Image Slider as background
             ImageSlider(
@@ -86,11 +86,11 @@ fun HomeScreen(
                 isEnglish = isEnglish
             )
 
-            // Dark overlay
+            // Dark overlay (50% transparency - more see-through)
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xCC1A1A2E)) // Semi-transparent dark overlay
+                    .background(Color(0x801A1A2E)) // 50% transparent dark overlay
             )
 
             // Header content on top
@@ -144,17 +144,6 @@ fun HomeScreen(
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Title text
-                Text(
-                    text = "Instant digital access to over 50\ngovernment services, all in one place",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    lineHeight = 24.sp
-                )
             }
         }
 

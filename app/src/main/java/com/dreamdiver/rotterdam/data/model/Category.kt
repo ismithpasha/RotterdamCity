@@ -14,11 +14,11 @@ data class Category(
     val name: String,
     @SerializedName("name_en")
     val nameEn: String? = null,
-    @SerializedName("icon_url")
+    @SerializedName(value = "icon", alternate = ["icon_url"])  // Handle both field names
     val icon: String,
     val status: String,
     @SerializedName("services_count")
-    val servicesCount: Int,
+    val servicesCount: Int? = null,  // Optional since nested categories may not have this
     @SerializedName("created_at")
     val createdAt: String,
     @SerializedName("updated_at")
