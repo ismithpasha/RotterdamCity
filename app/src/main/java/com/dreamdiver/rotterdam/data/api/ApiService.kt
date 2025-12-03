@@ -2,6 +2,7 @@ package com.dreamdiver.rotterdam.data.api
 
 import com.dreamdiver.rotterdam.data.model.AuthResponse
 import com.dreamdiver.rotterdam.data.model.CategoryResponse
+import com.dreamdiver.rotterdam.data.model.FeaturedServicesResponse
 import com.dreamdiver.rotterdam.data.model.LoginRequest
 import com.dreamdiver.rotterdam.data.model.ProfileUpdateResponse
 import com.dreamdiver.rotterdam.data.model.RegisterRequest
@@ -10,6 +11,7 @@ import com.dreamdiver.rotterdam.data.model.ServiceResponse
 import com.dreamdiver.rotterdam.data.model.SliderResponse
 import com.dreamdiver.rotterdam.data.model.SubCategoryResponse
 import com.dreamdiver.rotterdam.data.model.SubCategoryServiceResponse
+import com.dreamdiver.rotterdam.data.model.TrendingResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -20,6 +22,12 @@ interface ApiService {
 
     @GET("api/v1/sliders")
     suspend fun getSliders(): SliderResponse
+
+    @GET("api/v1/services/featured")
+    suspend fun getFeaturedServices(): FeaturedServicesResponse
+
+    @GET("api/v1/trending")
+    suspend fun getTrending(): TrendingResponse
 
     @GET("api/v1/subcategories/category/{categoryId}")
     suspend fun getSubCategories(@Path("categoryId") categoryId: Int): SubCategoryResponse
@@ -65,4 +73,3 @@ interface ApiService {
         @Part avatar: MultipartBody.Part?
     ): ProfileUpdateResponse
 }
-

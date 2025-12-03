@@ -128,3 +128,40 @@ data class ServiceDetail(
     val updatedAt: String
 )
 
+// Featured Services Response
+data class FeaturedServicesResponse(
+    val success: Boolean,
+    val data: List<Service>,
+    val count: Int,
+    val message: String
+)
+
+// Trending Response
+data class TrendingResponse(
+    val success: Boolean,
+    val data: List<TrendingItem>,
+    val count: Int,
+    val message: String
+)
+
+data class TrendingItem(
+    val id: Int,
+    val title: String,
+    @SerializedName("title_en")
+    val titleEn: String? = null,
+    val summary: String,
+    @SerializedName("summary_en")
+    val summaryEn: String? = null,
+    val details: String,
+    @SerializedName("details_en")
+    val detailsEn: String? = null,
+    val url: String?,
+    val image: String,
+    val status: String,
+    val order: Int,
+    val locale: String? = null,
+    @SerializedName("created_at")
+    val createdAt: String,
+    @SerializedName("updated_at")
+    val updatedAt: String
+)
