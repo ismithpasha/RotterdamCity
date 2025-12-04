@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -75,100 +74,45 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        // Header Section with Image Slider Background
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-        ) {
-            // Image Slider as background
-            ImageSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                isEnglish = isEnglish
-            )
-
-            // Dark overlay (50% transparency - more see-through)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0x801A1A2E)) // 50% transparent dark overlay
-            )
-
-            // Header content on top
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                // Top bar with search and notification
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Search bar (smaller, on left)
-                    TextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search for anything", color = Color.Gray, fontSize = 14.sp) },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(52.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            disabledContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent
-                        ),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    // Notification icon on right
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = Color.White
-                        )
-                    }
-                }
-            }
-        }
-
-        // Dynamic content based on state
+        // Scrollable content
         when (val state = uiState) {
             is HomeUiState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color = Color(0xFF6C63FF))
                 }
             }
             is HomeUiState.Success -> {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                    contentPadding = PaddingValues(top = 0.dp, bottom = 0.dp)
                 ) {
+                    // Image Slider section
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        ) {
+                            ImageSlider(
+                                modifier = Modifier.fillMaxSize(),
+                                isEnglish = isEnglish
+                            )
+
+//                            // Dark overlay
+//                            Box(
+//                                modifier = Modifier
+//                                    .fillMaxSize()
+//                                    .background(Color(0x88101846))
+//                            )
+                        }
+                    }
+
                     // Frequently used section
                     item {
                         FeaturedServicesSection(
@@ -207,7 +151,7 @@ fun HomeScreen(
                         Text(
                             text = state.message,
                             textAlign = TextAlign.Center,
-                            color = Color.White
+                            color = Color(0xFF2E3A59)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { viewModel.loadCategories() }) {
@@ -215,6 +159,64 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+
+        // Fixed Search Bar and Notification overlaid on top
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .align(Alignment.TopCenter),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Search bar
+            TextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Search for anything", color = Color.Gray, fontSize = 14.sp) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp)
+                    .shadow(
+                        elevation = 6.dp,
+                        shape = RoundedCornerShape(12.dp),
+                        spotColor = Color(0x14000000)
+                    )
+                    .clip(RoundedCornerShape(12.dp)),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    disabledContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent
+                ),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Notification icon
+            IconButton(
+                onClick = { },
+                modifier = Modifier.size(52.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notifications",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
     }
@@ -225,26 +227,38 @@ fun FeaturedServicesSection(
     services: List<Service>,
     isEnglish: Boolean
 ) {
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .shadow(
+                elevation = 3.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = Color(0x1A000000)
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Text(
-            text = "— Frequently used —",
-            fontSize = 12.sp,
-            color = Color.Gray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            items(services.take(4)) { service ->
-                FeaturedServiceCard(service = service, isEnglish = isEnglish)
+            Text(
+                text = "— Frequently used —",
+                fontSize = 12.sp,
+                color = Color(0xFF7C8BA0),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(services.take(4)) { service ->
+                    FeaturedServiceCard(service = service, isEnglish = isEnglish)
+                }
             }
         }
     }
@@ -254,21 +268,22 @@ fun FeaturedServicesSection(
 fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
     Card(
         modifier = Modifier
-            .width(200.dp)
-            .height(70.dp)
+            .width(100.dp)
+            .height(110.dp)
             .shadow(
-                elevation = 2.dp,
+                elevation = 4.dp,
                 shape = RoundedCornerShape(12.dp),
-                spotColor = Color(0x14000000)
+                spotColor = Color(0x1A6C63FF)
             ),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFBFD))
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
@@ -285,22 +300,18 @@ fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
-                    fontSize = 13.sp,
-                    color = Color(0xFF2E3A59),
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 16.sp
-                )
-            }
+            Text(
+                text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
+                fontSize = 12.sp,
+                color = Color(0xFF2E3A59),
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 14.sp,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

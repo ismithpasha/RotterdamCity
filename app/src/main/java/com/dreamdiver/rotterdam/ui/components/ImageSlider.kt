@@ -159,8 +159,8 @@ private fun SliderItemCard(slider: Slider) {
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
-            .padding(horizontal = 8.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(horizontal = 0.dp),
+        shape = RoundedCornerShape(0.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
