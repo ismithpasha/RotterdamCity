@@ -38,6 +38,9 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,6 +72,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -78,11 +82,13 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(180.dp)
         ) {
             // Image Slider as background
             ImageSlider(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
                 isEnglish = isEnglish
             )
 
@@ -107,8 +113,8 @@ fun HomeScreen(
                 ) {
                     // Search bar (smaller, on left)
                     TextField(
-                        value = "",
-                        onValueChange = {},
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
                         placeholder = { Text("Search for anything", color = Color.Gray, fontSize = 14.sp) },
                         leadingIcon = {
                             Icon(
@@ -120,7 +126,7 @@ fun HomeScreen(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp)
+                            .height(52.dp)
                             .clip(RoundedCornerShape(8.dp)),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.White,
