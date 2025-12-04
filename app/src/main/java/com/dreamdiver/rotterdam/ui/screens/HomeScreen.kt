@@ -388,20 +388,15 @@ fun AllServicesSection(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = "More",
-                fontSize = 14.sp,
-                color = Color(0xFF4DD0E1),
-                modifier = Modifier.clickable { }
-            )
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
+            columns = GridCells.Fixed(2),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.height(400.dp)
         ) {
             items(categories) { category ->
@@ -421,37 +416,48 @@ fun ServiceCategoryItem(
     onClick: () -> Unit,
     isEnglish: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Card(
         modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(4.dp)
+            .fillMaxWidth()
+            .height(100.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .size(56.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFFE8F4FF)),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(12.dp),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
         ) {
-            AsyncImage(
-                model = category.icon,
-                contentDescription = category.name,
-                modifier = Modifier.size(36.dp),
-                contentScale = ContentScale.Fit
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFE8F4FF)),
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = category.icon,
+                    contentDescription = category.name,
+                    modifier = Modifier.size(30.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = if (isEnglish) (category.nameEn ?: category.name) else category.name,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 16.sp,
+                textAlign = TextAlign.Start
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = if (isEnglish) (category.nameEn ?: category.name) else category.name,
-            fontSize = 11.sp,
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            lineHeight = 13.sp
-        )
     }
 }
 
