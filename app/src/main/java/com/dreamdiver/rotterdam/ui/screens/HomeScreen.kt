@@ -268,8 +268,8 @@ fun FeaturedServicesSection(
 fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
     Card(
         modifier = Modifier
-            .width(100.dp)
-            .height(110.dp)
+            .width(85.dp)
+            .height(95.dp)
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(12.dp),
@@ -281,13 +281,13 @@ fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
-                    .size(46.dp)
+                    .size(40.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color(0xFFF0EFFF)), // Light purple background
                 contentAlignment = Alignment.Center
@@ -295,21 +295,21 @@ fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
                 AsyncImage(
                     model = service.category.icon,
                     contentDescription = service.name,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.Fit
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = Color(0xFF2E3A59),
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                lineHeight = 14.sp,
+                lineHeight = 13.sp,
                 textAlign = TextAlign.Center
             )
         }
