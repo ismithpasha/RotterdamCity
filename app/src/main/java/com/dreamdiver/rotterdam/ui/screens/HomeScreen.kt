@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -240,7 +241,7 @@ fun FeaturedServicesSection(
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(services.take(4)) { service ->
                 FeaturedServiceCard(service = service, isEnglish = isEnglish)
@@ -251,35 +252,56 @@ fun FeaturedServicesSection(
 
 @Composable
 fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(80.dp)
+    Card(
+        modifier = Modifier
+            .width(200.dp)
+            .height(70.dp)
+            .shadow(
+                elevation = 2.dp,
+                shape = RoundedCornerShape(12.dp),
+                spotColor = Color(0x14000000)
+            ),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFFE8F4FF)),
-            contentAlignment = Alignment.Center
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = service.category.icon,
-                contentDescription = service.name,
-                modifier = Modifier.size(40.dp),
-                contentScale = ContentScale.Fit
-            )
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFF0EFFF)), // Light purple background
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = service.category.icon,
+                    contentDescription = service.name,
+                    modifier = Modifier.size(28.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
+                    fontSize = 13.sp,
+                    color = Color(0xFF2E3A59),
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 16.sp
+                )
+            }
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            lineHeight = 14.sp
-        )
     }
 }
 
