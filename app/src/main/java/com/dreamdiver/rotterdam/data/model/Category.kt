@@ -82,7 +82,7 @@ data class Service(
     val description: String,
     @SerializedName("description_en")
     val descriptionEn: String? = null,
-    @SerializedName("image_url")
+    @SerializedName("image")
     val image: String?,
     val status: String,
     val locale: String? = null,
@@ -118,7 +118,7 @@ data class ServiceDetail(
     val description: String,
     @SerializedName("description_en")
     val descriptionEn: String? = null,
-    @SerializedName("image_url")
+    @SerializedName("image")
     val image: String?,
     val status: String,
     val locale: String? = null,

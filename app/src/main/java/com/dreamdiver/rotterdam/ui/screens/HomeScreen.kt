@@ -86,6 +86,7 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedService by remember { mutableStateOf<Service?>(null) }
     var selectedTrendingItem by remember { mutableStateOf<TrendingItem?>(null) }
+    var selectedSlider by remember { mutableStateOf<com.dreamdiver.rotterdam.data.model.Slider?>(null) }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -114,7 +115,8 @@ fun HomeScreen(
                         ) {
                             ImageSlider(
                                 modifier = Modifier.fillMaxSize(),
-                                isEnglish = isEnglish
+                                isEnglish = isEnglish,
+                                onSliderClick = { slider -> selectedSlider = slider }
                             )
 
 //                            // Dark overlay
@@ -250,6 +252,15 @@ fun HomeScreen(
             trendingItem = item,
             isEnglish = isEnglish,
             onDismiss = { selectedTrendingItem = null }
+        )
+    }
+
+    // Show slider detail modal if a slider is selected
+    selectedSlider?.let { slider ->
+        SliderDetailModal(
+            slider = slider,
+            isEnglish = isEnglish,
+            onDismiss = { selectedSlider = null }
         )
     }
 }
@@ -638,6 +649,121 @@ fun TrendingDetailModal(
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SliderDetailModal(
+    slider: com.dreamdiver.rotterdam.data.model.Slider,
+    isEnglish: Boolean,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 32.dp)
+        ) {
+            // Header with close button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Slider Details",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close"
+                    )
+                }
+            }
+
+            // Slider Image
+            AsyncImage(
+                model = slider.image,
+                contentDescription = if (isEnglish) (slider.titleEn ?: slider.title) else slider.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Title
+            Text(
+                text = if (isEnglish) (slider.titleEn ?: slider.title) else slider.title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Date
+            Text(
+                text = "Created: ${slider.createdAt.take(10)}",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Short Details Section
+            Text(
+                text = "Summary",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (isEnglish) (slider.shortDetailsEn ?: slider.shortDetails) else slider.shortDetails,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Full Details Section
+            Text(
+                text = "Full Details",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (isEnglish) (slider.detailsEn ?: slider.details) else slider.details,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

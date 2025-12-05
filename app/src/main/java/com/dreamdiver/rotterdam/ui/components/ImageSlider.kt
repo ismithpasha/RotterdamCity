@@ -48,6 +48,7 @@ fun ImageSlider(
     modifier: Modifier = Modifier,
     isEnglish: Boolean = true,
     autoScrollInterval: Long = 3000L,
+    onSliderClick: (Slider) -> Unit = {},
     viewModel: SliderViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,7 +70,8 @@ fun ImageSlider(
                 DynamicSlider(
                     modifier = modifier,
                     sliders = state.sliders,
-                    autoScrollInterval = autoScrollInterval
+                    autoScrollInterval = autoScrollInterval,
+                    onSliderClick = onSliderClick
                 )
             } else {
                 Box(
@@ -105,7 +107,8 @@ fun ImageSlider(
 private fun DynamicSlider(
     modifier: Modifier = Modifier,
     sliders: List<Slider>,
-    autoScrollInterval: Long = 3000L
+    autoScrollInterval: Long = 3000L,
+    onSliderClick: (Slider) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = { sliders.size })
 
@@ -123,7 +126,10 @@ private fun DynamicSlider(
             state = pagerState,
             modifier = Modifier.fillMaxWidth()
         ) { page ->
-            SliderItemCard(slider = sliders[page])
+            SliderItemCard(
+                slider = sliders[page],
+                onClick = { onSliderClick(sliders[page]) }
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -154,14 +160,18 @@ private fun DynamicSlider(
 }
 
 @Composable
-private fun SliderItemCard(slider: Slider) {
+private fun SliderItemCard(
+    slider: Slider,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(180.dp)
             .padding(horizontal = 0.dp),
         shape = RoundedCornerShape(0.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        onClick = onClick
     ) {
         Box(
             modifier = Modifier.fillMaxSize()

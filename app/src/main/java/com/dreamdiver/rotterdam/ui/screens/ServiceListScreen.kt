@@ -218,7 +218,7 @@ fun ServiceCard(
         ) {
             // Service Image
             AsyncImage(
-                model = service.image,
+                model = service.image?.takeIf { it.isNotEmpty() } ?: service.category.icon,
                 contentDescription = service.name,
                 modifier = Modifier
                     .size(80.dp)
@@ -311,7 +311,7 @@ fun ServiceDetailModal(
 
             // Service Image
             AsyncImage(
-                model = serviceDetail.image,
+                model = serviceDetail.image?.takeIf { it.isNotEmpty() } ?: serviceDetail.category.icon,
                 contentDescription = serviceDetail.name,
                 modifier = Modifier
                     .fillMaxWidth()
