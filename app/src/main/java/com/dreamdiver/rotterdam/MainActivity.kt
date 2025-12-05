@@ -2,6 +2,7 @@ package com.dreamdiver.rotterdam
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.activity.compose.BackHandler
 import kotlinx.parcelize.Parcelize
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +17,8 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.lifecycle.lifecycleScope
@@ -101,6 +105,54 @@ fun CumillaCityApp(
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
     var subcategoryListState by rememberSaveable { mutableStateOf<SubCategoryListState?>(null) }
     var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(if (!isLoggedIn) AuthScreen.LOGIN else null) }
+    var showExitDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Get activity context for exit functionality
+    val activity = LocalContext.current as? ComponentActivity
+
+    // Handle back button press
+    BackHandler(enabled = true) {
+        when {
+            // If showing detail screen, go back to main navigation
+            currentDetailScreen != null -> {
+                currentDetailScreen = null
+                serviceListState = null
+                subcategoryListState = null
+            }
+            // If not on home screen, go to home
+            currentDestination != AppDestinations.HOME -> {
+                currentDestination = AppDestinations.HOME
+            }
+            // If on home screen, show exit confirmation
+            else -> {
+                showExitDialog = true
+            }
+        }
+    }
+
+    // Exit confirmation dialog
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(if (isEnglish) "Exit App" else "অ্যাপ থেকে বের হন") },
+            text = { Text(if (isEnglish) "Are you sure you want to exit?" else "আপনি কি নিশ্চিত যে আপনি প্রস্থান করতে চান?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showExitDialog = false
+                        activity?.finish()
+                    }
+                ) {
+                    Text(if (isEnglish) "Exit" else "প্রস্থান")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(if (isEnglish) "Cancel" else "বাতিল")
+                }
+            }
+        )
+    }
 
     // Create a shared HomeViewModel to manage home screen state
     val homeViewModel: HomeViewModel = viewModel()

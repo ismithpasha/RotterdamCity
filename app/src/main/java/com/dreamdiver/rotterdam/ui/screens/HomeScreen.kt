@@ -20,9 +20,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -31,9 +35,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,10 +63,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.dreamdiver.rotterdam.data.model.Category
 import com.dreamdiver.rotterdam.data.model.Service
+import com.dreamdiver.rotterdam.data.model.ServiceDetail
 import com.dreamdiver.rotterdam.data.model.TrendingItem
 import com.dreamdiver.rotterdam.ui.components.ImageSlider
 import com.dreamdiver.rotterdam.ui.viewmodel.HomeUiState
 import com.dreamdiver.rotterdam.ui.viewmodel.HomeViewModel
+import android.content.Intent
+import android.net.Uri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +84,8 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var selectedService by remember { mutableStateOf<Service?>(null) }
+    var selectedTrendingItem by remember { mutableStateOf<TrendingItem?>(null) }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -117,7 +130,8 @@ fun HomeScreen(
                     item {
                         FeaturedServicesSection(
                             services = state.featuredServices,
-                            isEnglish = isEnglish
+                            isEnglish = isEnglish,
+                            onServiceClick = { service -> selectedService = service }
                         )
                     }
 
@@ -125,7 +139,8 @@ fun HomeScreen(
                     item {
                         TrendingSection(
                             trendingItems = state.trendingItems,
-                            isEnglish = isEnglish
+                            isEnglish = isEnglish,
+                            onTrendingClick = { item -> selectedTrendingItem = item }
                         )
                     }
 
@@ -220,12 +235,54 @@ fun HomeScreen(
             }
         }
     }
+
+    // Show service detail modal if a service is selected
+    selectedService?.let { service ->
+        ServiceDetailModal(
+            serviceDetail = service.toServiceDetail(),
+            onDismiss = { selectedService = null }
+        )
+    }
+
+    // Show trending detail modal if a trending item is selected
+    selectedTrendingItem?.let { item ->
+        TrendingDetailModal(
+            trendingItem = item,
+            isEnglish = isEnglish,
+            onDismiss = { selectedTrendingItem = null }
+        )
+    }
+}
+
+// Extension function to convert Service to ServiceDetail
+fun Service.toServiceDetail(): ServiceDetail {
+    return ServiceDetail(
+        id = this.id,
+        categoryId = this.categoryId,
+        category = this.category,
+        name = this.name,
+        nameEn = this.nameEn,
+        phone = this.phone,
+        address = this.address,
+        addressEn = this.addressEn,
+        latitude = this.latitude,
+        longitude = this.longitude,
+        googleMapsUrl = this.googleMapsUrl,
+        description = this.description,
+        descriptionEn = this.descriptionEn,
+        image = this.image?.takeIf { it.isNotEmpty() } ?: "https://via.placeholder.com/400x200?text=No+Image",
+        status = this.status,
+        locale = this.locale,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
+    )
 }
 
 @Composable
 fun FeaturedServicesSection(
     services: List<Service>,
-    isEnglish: Boolean
+    isEnglish: Boolean,
+    onServiceClick: (Service) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -257,7 +314,11 @@ fun FeaturedServicesSection(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(services.take(4)) { service ->
-                    FeaturedServiceCard(service = service, isEnglish = isEnglish)
+                    FeaturedServiceCard(
+                        service = service,
+                        isEnglish = isEnglish,
+                        onClick = { onServiceClick(service) }
+                    )
                 }
             }
         }
@@ -265,11 +326,16 @@ fun FeaturedServicesSection(
 }
 
 @Composable
-fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
+fun FeaturedServiceCard(
+    service: Service,
+    isEnglish: Boolean,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .width(85.dp)
             .height(95.dp)
+            .clickable(onClick = onClick)
             .shadow(
                 elevation = 4.dp,
                 shape = RoundedCornerShape(12.dp),
@@ -319,7 +385,8 @@ fun FeaturedServiceCard(service: Service, isEnglish: Boolean) {
 @Composable
 fun TrendingSection(
     trendingItems: List<TrendingItem>,
-    isEnglish: Boolean
+    isEnglish: Boolean,
+    onTrendingClick: (TrendingItem) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -339,19 +406,27 @@ fun TrendingSection(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(trendingItems) { item ->
-                TrendingCard(item = item, isEnglish = isEnglish)
+                TrendingCard(
+                    item = item,
+                    isEnglish = isEnglish,
+                    onClick = { onTrendingClick(item) }
+                )
             }
         }
     }
 }
 
 @Composable
-fun TrendingCard(item: TrendingItem, isEnglish: Boolean) {
+fun TrendingCard(
+    item: TrendingItem,
+    isEnglish: Boolean,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .width(280.dp)
             .height(120.dp)
-            .clickable { },
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF4DD0E1))
     ) {
@@ -395,6 +470,174 @@ fun TrendingCard(item: TrendingItem, isEnglish: Boolean) {
                     .clip(RoundedCornerShape(4.dp))
                     .background(Color.White)
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TrendingDetailModal(
+    trendingItem: TrendingItem,
+    isEnglish: Boolean,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 32.dp)
+        ) {
+            // Header with close button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Trending Details",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close"
+                    )
+                }
+            }
+
+            // Trending Image
+            AsyncImage(
+                model = trendingItem.image,
+                contentDescription = if (isEnglish) (trendingItem.titleEn ?: trendingItem.title) else trendingItem.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(horizontal = 16.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Title
+            Text(
+                text = if (isEnglish) (trendingItem.titleEn ?: trendingItem.title) else trendingItem.title,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Date
+            Text(
+                text = "Published: ${trendingItem.createdAt.take(10)}",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Summary Section
+            Text(
+                text = "Summary",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (isEnglish) (trendingItem.summaryEn ?: trendingItem.summary) else trendingItem.summary,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Details Section
+            Text(
+                text = "Details",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (isEnglish) (trendingItem.detailsEn ?: trendingItem.details) else trendingItem.details,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Open URL Button (if URL exists)
+            trendingItem.url?.let { url ->
+                if (url.isNotEmpty()) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                                context.startActivity(intent)
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.OpenInBrowser,
+                                    contentDescription = "Open in Browser",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Read Full Article",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                    Text(
+                                        text = "Open in browser",
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
