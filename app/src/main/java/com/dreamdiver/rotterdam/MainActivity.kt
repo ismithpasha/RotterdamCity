@@ -171,12 +171,14 @@ fun CumillaCityApp(
                 viewModel = authViewModel,
                 onLoginSuccess = { showAuthScreen = null },
                 onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
+                onBackToHome = { showAuthScreen = null },
                 isEnglish = isEnglish
             )
             AuthScreen.REGISTER -> RegisterScreen(
                 viewModel = authViewModel,
                 onRegisterSuccess = { showAuthScreen = null },
                 onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
+                onBackToHome = { showAuthScreen = null },
                 isEnglish = isEnglish
             )
             null -> {} // Should never happen due to outer if condition

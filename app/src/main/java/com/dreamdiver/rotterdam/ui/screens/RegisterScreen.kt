@@ -1,5 +1,6 @@
 package com.dreamdiver.rotterdam.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,6 +35,7 @@ fun RegisterScreen(
     viewModel: AuthViewModel,
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onBackToHome: () -> Unit = {},
     isEnglish: Boolean = true
 ) {
     var name by remember { mutableStateOf("") }
@@ -49,6 +52,11 @@ fun RegisterScreen(
 
     val focusManager = LocalFocusManager.current
     val authState by viewModel.authState.collectAsState()
+
+    // Handle hardware back button press - go to home
+    BackHandler {
+        onBackToHome()
+    }
 
     // Handle registration success
     LaunchedEffect(authState) {
@@ -70,6 +78,20 @@ fun RegisterScreen(
                 )
             )
     ) {
+        // Back button at top-left
+        IconButton(
+            onClick = onBackToHome,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = if (isEnglish) "Back to Home" else "Terug naar Home",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -366,6 +388,20 @@ fun RegisterScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // Back button at top-left (placed after Column for proper z-ordering)
+        IconButton(
+            onClick = onBackToHome,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = if (isEnglish) "Back to Home" else "Terug naar Home",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
