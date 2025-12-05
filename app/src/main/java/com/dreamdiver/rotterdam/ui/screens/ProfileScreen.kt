@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -31,6 +32,8 @@ fun ProfileScreen(
     authViewModel: AuthViewModel? = null,
     onLogout: () -> Unit,
     onEditProfile: () -> Unit,
+    onNavigateToLogin: () -> Unit = {},
+    onNavigateToRegister: () -> Unit = {},
     isEnglish: Boolean = true
 ) {
     val scope = rememberCoroutineScope()
@@ -52,6 +55,7 @@ fun ProfileScreen(
     var userAverageRating by remember { mutableStateOf("") }
     var userTotalRatings by remember { mutableStateOf<Int?>(null) }
     var authToken by remember { mutableStateOf("") }
+    var isLoggedIn by remember { mutableStateOf(false) }
 
     // Function to load user data
     fun loadUserData() {
@@ -76,6 +80,7 @@ fun ProfileScreen(
             userAverageRating = preferencesManager.userAverageRating.first() ?: ""
             userTotalRatings = preferencesManager.userTotalRatings.first()
             authToken = preferencesManager.authToken.first() ?: ""
+            isLoggedIn = authToken.isNotBlank()
         }
     }
 
@@ -105,6 +110,176 @@ fun ProfileScreen(
         }
     }
 
+    // Show login/register options if not logged in, otherwise show profile
+    if (!isLoggedIn) {
+        LoginRegisterView(
+            modifier = modifier,
+            onNavigateToLogin = onNavigateToLogin,
+            onNavigateToRegister = onNavigateToRegister,
+            isEnglish = isEnglish
+        )
+    } else {
+        // Existing profile screen content
+        LoggedInProfileView(
+            modifier = modifier,
+            userName = userName,
+            userEmail = userEmail,
+            userType = userType,
+            userPhone = userPhone,
+            userCity = userCity,
+            userAvatar = userAvatar,
+            userAddress = userAddress,
+            userState = userState,
+            userZipCode = userZipCode,
+            userBio = userBio,
+            userSkillCategory = userSkillCategory,
+            userHourlyRate = userHourlyRate,
+            userExperienceYears = userExperienceYears,
+            userSkills = userSkills,
+            userCertifications = userCertifications,
+            userAverageRating = userAverageRating,
+            userTotalRatings = userTotalRatings,
+            onLogout = onLogout,
+            onEditProfile = onEditProfile,
+            isEnglish = isEnglish
+        )
+    }
+}
+
+@Composable
+fun LoginRegisterView(
+    modifier: Modifier = Modifier,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToRegister: () -> Unit,
+    isEnglish: Boolean = true
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Icon
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = null,
+            modifier = Modifier.size(100.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = if (isEnglish) "Welcome to Rotterdam City" else "Welkom in Rotterdam",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = if (isEnglish)
+                "Sign in to access your profile and personalized services"
+            else
+                "Meld u aan om toegang te krijgen tot uw profiel en gepersonaliseerde diensten",
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        // Login Button
+        Button(
+            onClick = onNavigateToLogin,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Login,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = if (isEnglish) "Sign In" else "Aanmelden",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Register Button
+        OutlinedButton(
+            onClick = onNavigateToRegister,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .height(50.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.PersonAdd,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = if (isEnglish) "Create Account" else "Account Aanmaken",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = if (isEnglish)
+                "Browse services without logging in"
+            else
+                "Blader door diensten zonder in te loggen",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun LoggedInProfileView(
+    modifier: Modifier = Modifier,
+    userName: String,
+    userEmail: String,
+    userType: String,
+    userPhone: String,
+    userCity: String,
+    userAvatar: String?,
+    userAddress: String,
+    userState: String,
+    userZipCode: String,
+    userBio: String,
+    userSkillCategory: String,
+    userHourlyRate: String,
+    userExperienceYears: Int?,
+    userSkills: List<String>,
+    userCertifications: List<String>,
+    userAverageRating: String,
+    userTotalRatings: Int?,
+    onLogout: () -> Unit,
+    onEditProfile: () -> Unit,
+    isEnglish: Boolean
+) {
     Column(
         modifier = modifier
             .fillMaxSize()

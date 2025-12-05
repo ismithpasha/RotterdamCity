@@ -104,7 +104,7 @@ fun CumillaCityApp(
     var currentDetailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
     var subcategoryListState by rememberSaveable { mutableStateOf<SubCategoryListState?>(null) }
-    var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(if (!isLoggedIn) AuthScreen.LOGIN else null) }
+    var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(null) }
     var showExitDialog by rememberSaveable { mutableStateOf(false) }
 
     // Get activity context for exit functionality
@@ -305,6 +305,8 @@ fun CumillaCityApp(
                                 authViewModel = authViewModel,
                                 onLogout = { authViewModel.logout() },
                                 onEditProfile = { currentDetailScreen = DetailScreen.EDIT_PROFILE },
+                                onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
+                                onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
                                 isEnglish = isEnglish
                             )
                         }
