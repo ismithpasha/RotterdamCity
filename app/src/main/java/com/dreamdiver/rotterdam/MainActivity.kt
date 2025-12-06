@@ -134,8 +134,8 @@ fun CumillaCityApp(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text(if (isEnglish) "Exit App" else "অ্যাপ থেকে বের হন") },
-            text = { Text(if (isEnglish) "Are you sure you want to exit?" else "আপনি কি নিশ্চিত যে আপনি প্রস্থান করতে চান?") },
+            title = { Text(if (isEnglish) "Exit App" else "App afsluiten") },
+            text = { Text(if (isEnglish) "Are you sure you want to exit?" else "Weet je zeker dat je wilt afsluiten?") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -143,12 +143,12 @@ fun CumillaCityApp(
                         activity?.finish()
                     }
                 ) {
-                    Text(if (isEnglish) "Exit" else "প্রস্থান")
+                    Text(if (isEnglish) "Exit" else "Afsluiten")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text(if (isEnglish) "Cancel" else "বাতিল")
+                    Text(if (isEnglish) "Cancel" else "Annuleren")
                 }
             }
         )

@@ -37,7 +37,7 @@ fun TermsConditionsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEnglish) "Terms & Conditions" else "শর্তাবলী",
+                        text = if (isEnglish) "Terms & Conditions" else "Voorwaarden",
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -45,7 +45,7 @@ fun TermsConditionsScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = if (isEnglish) "Back" else "পেছনে"
+                            contentDescription = if (isEnglish) "Back" else "Terug"
                         )
                     }
                 },
@@ -65,22 +65,22 @@ fun TermsConditionsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = if (isEnglish) "Last Updated: November 2, 2025" else "সর্বশেষ আপডেট: নভেম্বর ২, ২০২৫",
+                text = if (isEnglish) "Last Updated: November 2, 2025" else "Laatst bijgewerkt: 2 november 2025",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             TermsSection(
-                title = if (isEnglish) "1. Acceptance of Terms" else "১. শর্তাবলীর গ্রহণযোগ্যতা",
+                title = if (isEnglish) "1. Acceptance of Terms" else "1. Acceptatie van Voorwaarden",
                 content = if (isEnglish)
                     "By accessing and using the Rotterdam City app, you accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to these Terms and Conditions, please do not use this app."
                 else
-                    "রটারডাম সিটি অ্যাপ অ্যাক্সেস এবং ব্যবহার করে, আপনি এই চুক্তির শর্তাবলী এবং বিধানগুলি মেনে চলতে সম্মত হন। আপনি যদি এই শর্তাবলীতে সম্মত না হন, অনুগ্রহ করে এই অ্যাপটি ব্যবহার করবেন না।"
+                    "Door de Rotterdam City-app te openen en te gebruiken, accepteert en stemt u in met de voorwaarden en bepalingen van deze overeenkomst. Als u niet akkoord gaat met deze Voorwaarden, gebruik deze app dan niet."
             )
 
             TermsSection(
-                title = if (isEnglish) "2. Use of Service" else "২. সেবা ব্যবহার",
+                title = if (isEnglish) "2. Use of Service" else "2. Gebruik van de Service",
                 content = if (isEnglish)
                     "You agree to use the Rotterdam City app only for lawful purposes and in accordance with these Terms. You agree not to:\n\n" +
                             "• Use the app in any way that violates any applicable law or regulation\n" +
@@ -89,32 +89,32 @@ fun TermsConditionsScreen(
                             "• Attempt to gain unauthorized access to any portion of the app\n" +
                             "• Use automated systems to access the app without permission"
                 else
-                    "আপনি শুধুমাত্র আইনসম্মত উদ্দেশ্যে এবং এই শর্তাবলী অনুযায়ী রটারডাম সিটি অ্যাপ ব্যবহার করতে সম্মত হন। আপনি সম্মত হন না:\n\n" +
-                            "• অ্যাপটি এমনভাবে ব্যবহার করবেন না যা কোনো প্রযোজ্য আইন বা নিয়ম লঙ্ঘন করে\n" +
-                            "• এমন কোনো আচরণে জড়িত হবেন না যা কারো অ্যাপ ব্যবহারে বাধা দেয়\n" +
-                            "• ক্ষতিকারক বা দূষিত কোড প্রেরণ করতে অ্যাপ ব্যবহার করবেন না\n" +
-                            "• অ্যাপের কোনো অংশে অননুমোদিত প্রবেশাধিকার পাওয়ার চেষ্টা করবেন না\n" +
-                            "• অনুমতি ছাড়া অ্যাপ অ্যাক্সেস করতে স্বয়ংক্রিয় সিস্টেম ব্যবহার করবেন না"
+                    "U stemt ermee in de Rotterdam City-app alleen te gebruiken voor wettige doeleinden en in overeenstemming met deze Voorwaarden. U stemt ermee in om niet:\n\n" +
+                            "• De app te gebruiken op een manier die een toepasselijke wet of regelgeving schendt\n" +
+                            "• Zich bezig te houden met gedrag dat het gebruik van de app door anderen beperkt of belemmert\n" +
+                            "• De app te gebruiken om schadelijke of kwaadaardige code te verzenden\n" +
+                            "• Te proberen ongeautoriseerde toegang te verkrijgen tot een deel van de app\n" +
+                            "• Geautomatiseerde systemen te gebruiken om zonder toestemming toegang te krijgen tot de app"
             )
 
             TermsSection(
-                title = if (isEnglish) "3. Information Accuracy" else "৩. তথ্য নির্ভুলতা",
+                title = if (isEnglish) "3. Information Accuracy" else "3. Nauwkeurigheid van Informatie",
                 content = if (isEnglish)
                     "We strive to provide accurate and up-to-date information through the Rotterdam City app. However, we do not guarantee the accuracy, completeness, or reliability of any information provided. Users should verify critical information independently before relying on it."
                 else
-                    "আমরা রটারডাম সিটি অ্যাপের মাধ্যমে সঠিক এবং আপ-টু-ডেট তথ্য প্রদান করার চেষ্টা করি। তবে, আমরা প্রদত্ত কোনো তথ্যের সঠিকতা, সম্পূর্ণতা বা নির্ভরযোগ্যতার গ্যারান্টি দিই না। ব্যবহারকারীদের এটির উপর নির্ভর করার আগে গুরুত্বপূর্ণ তথ্য স্বাধীনভাবে যাচাই করা উচিত।"
+                    "We streven ernaar nauwkeurige en actuele informatie te verstrekken via de Rotterdam City-app. We garanderen echter niet de nauwkeurigheid, volledigheid of betrouwbaarheid van de verstrekte informatie. Gebruikers moeten kritieke informatie zelfstandig verifiëren voordat ze erop vertrouwen."
             )
 
             TermsSection(
-                title = if (isEnglish) "4. Third-Party Services" else "৪. তৃতীয় পক্ষ সেবা",
+                title = if (isEnglish) "4. Third-Party Services" else "4. Diensten van Derden",
                 content = if (isEnglish)
                     "The app may contain links to third-party websites or services that are not owned or controlled by Rotterdam City. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party websites or services."
                 else
-                    "অ্যাপে তৃতীয় পক্ষের ওয়েবসাইট বা সেবার লিঙ্ক থাকতে পারে যা রটারডাম সিটির মালিকানা বা নিয়ন্ত্রণে নেই। আমাদের কোনো তৃতীয় পক্ষের ওয়েবসাইট বা সেবার বিষয়বস্তু, গোপনীয়তা নীতি বা অনুশীলনের উপর কোনো নিয়ন্ত্রণ নেই এবং কোনো দায়িত্ব গ্রহণ করি না।"
+                    "De app kan links bevatten naar websites of diensten van derden die niet eigendom zijn van of worden beheerd door Rotterdam City. We hebben geen controle over en nemen geen verantwoordelijkheid voor de inhoud, het privacybeleid of de praktijken van websites of diensten van derden."
             )
 
             TermsSection(
-                title = if (isEnglish) "5. Disclaimer of Warranties" else "৫. ওয়ারেন্টির দাবিত্যাগ",
+                title = if (isEnglish) "5. Disclaimer of Warranties" else "5. Disclaimer van Garanties",
                 content = if (isEnglish)
                     "The Rotterdam City app is provided on an \"AS IS\" and \"AS AVAILABLE\" basis without any warranties of any kind. We do not warrant that:\n\n" +
                             "• The app will function without interruption or be error-free\n" +
@@ -122,35 +122,35 @@ fun TermsConditionsScreen(
                             "• The app is free of viruses or harmful components\n" +
                             "• Information will be accurate, reliable, or correct"
                 else
-                    "রটারডাম সিটি অ্যাপ কোনো ধরনের ওয়ারেন্টি ছাড়াই \"যেমন আছে\" এবং \"যেমন উপলব্ধ\" ভিত্তিতে প্রদান করা হয়। আমরা ওয়ারেন্ট করি না যে:\n\n" +
-                            "• অ্যাপটি বাধা ছাড়াই কাজ করবে বা ত্রুটি-মুক্ত হবে\n" +
-                            "• ত্রুটিগুলি সংশোধন করা হবে\n" +
-                            "• অ্যাপটি ভাইরাস বা ক্ষতিকারক উপাদান মুক্ত\n" +
-                            "• তথ্য সঠিক, নির্ভরযোগ্য বা সঠিক হবে"
+                    "De Rotterdam City-app wordt geleverd op \"AS IS\" en \"AS AVAILABLE\" basis zonder enige garanties van welke aard dan ook. We garanderen niet dat:\n\n" +
+                            "• De app zonder onderbreking zal functioneren of foutloos zal zijn\n" +
+                            "• Defecten zullen worden gecorrigeerd\n" +
+                            "• De app vrij is van virussen of schadelijke componenten\n" +
+                            "• Informatie nauwkeurig, betrouwbaar of correct zal zijn"
             )
 
             TermsSection(
-                title = if (isEnglish) "6. Limitation of Liability" else "৬. দায় সীমাবদ্ধতা",
+                title = if (isEnglish) "6. Limitation of Liability" else "6. Beperking van Aansprakelijkheid",
                 content = if (isEnglish)
                     "To the maximum extent permitted by law, Rotterdam City shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the app."
                 else
-                    "আইন দ্বারা অনুমোদিত সর্বোচ্চ সীমা পর্যন্ত, রটারডাম সিটি আপনার অ্যাপ ব্যবহার বা ব্যবহার করতে অক্ষমতার ফলে উদ্ভূত কোনো পরোক্ষ, আনুষঙ্গিক, বিশেষ, ফলস্বরূপ বা শাস্তিমূলক ক্ষতির জন্য দায়বদ্ধ হবে না।"
+                    "Voor zover maximaal toegestaan door de wet, is Rotterdam City niet aansprakelijk voor indirecte, incidentele, speciale, gevolgschade of punitieve schade als gevolg van uw gebruik of onvermogen om de app te gebruiken."
             )
 
             TermsSection(
-                title = if (isEnglish) "7. Changes to Terms" else "৭. শর্তাবলী পরিবর্তন",
+                title = if (isEnglish) "7. Changes to Terms" else "7. Wijzigingen in Voorwaarden",
                 content = if (isEnglish)
                     "We reserve the right to modify these Terms and Conditions at any time. Changes will be effective immediately upon posting. Your continued use of the app after changes constitutes acceptance of the modified terms."
                 else
-                    "আমরা যে কোনো সময় এই শর্তাবলী পরিবর্তন করার অধিকার সংরক্ষণ করি। পরিবর্তনগুলি পোস্ট করার সাথে সাথে কার্যকর হবে। পরিবর্তনের পরে আপনার অ্যাপের অব্যাহত ব্যবহার পরিবর্তিত শর্তাবলীর গ্রহণযোগ্যতা গঠন করে।"
+                    "We behouden ons het recht voor om deze Voorwaarden op elk moment te wijzigen. Wijzigingen worden onmiddellijk van kracht na publicatie. Uw voortgezet gebruik van de app na wijzigingen houdt acceptatie van de gewijzigde voorwaarden in."
             )
 
             TermsSection(
-                title = if (isEnglish) "8. Contact Information" else "৮. যোগাযোগ তথ্য",
+                title = if (isEnglish) "8. Contact Information" else "8. Contactgegevens",
                 content = if (isEnglish)
                     "For questions about these Terms and Conditions, please contact us at:\n\nEmail: legal@rotterdamcity.com\nPhone: +31-10-XXX-XXXX\nAddress: Rotterdam, Netherlands"
                 else
-                    "এই শর্তাবলী সম্পর্কে প্রশ্নের জন্য, আমাদের সাথে যোগাযোগ করুন:\n\nইমেইল: legal@rotterdamcity.com\nফোন: +৩১-১০-XXX-XXXX\nঠিকানা: রটারডাম, নেদারল্যান্ডস"
+                    "Voor vragen over deze Voorwaarden kunt u contact met ons opnemen via:\n\nE-mail: legal@rotterdamcity.com\nTelefoon: +31-10-XXX-XXXX\nAdres: Rotterdam, Nederland"
             )
         }
     }

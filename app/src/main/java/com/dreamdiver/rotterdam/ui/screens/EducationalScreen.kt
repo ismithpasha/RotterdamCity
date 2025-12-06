@@ -70,7 +70,7 @@ fun EducationalScreen(
     val tabs = if (isEnglish) {
         listOf("School", "College", "Madrasa")
     } else {
-        listOf("স্কুল", "কলেজ", "মাদ্রাসা")
+        listOf("School", "Hogeschool", "Madrasa")
     }
 
     Scaffold(
@@ -78,7 +78,7 @@ fun EducationalScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEnglish) "Educational Institutions" else "শিক্ষা প্রতিষ্ঠান",
+                        text = if (isEnglish) "Educational Institutions" else "Onderwijsinstellingen",
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -86,7 +86,7 @@ fun EducationalScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = if (isEnglish) "Back" else "পেছনে"
+                            contentDescription = if (isEnglish) "Back" else "Terug"
                         )
                     }
                 },
@@ -147,9 +147,9 @@ fun EducationalScreen(
                 ) {
                     Text(
                         text = if (isEnglish)
-                            "📚 ${institutions.size} ${tabs[selectedTabIndex]}s in Cumilla"
+                            "📚 ${institutions.size} ${tabs[selectedTabIndex]}s in Rotterdam"
                         else
-                            "📚 কুমিল্লায় ${institutions.size}টি ${tabs[selectedTabIndex]}",
+                            "📚 ${institutions.size} ${tabs[selectedTabIndex]} in Rotterdam",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -214,7 +214,7 @@ fun EducationalScreen(
                         text = if (isEnglish)
                             "ℹ️ Tap phone icon to call, email icon to send email, or location icon to view on map."
                         else
-                            "ℹ️ ফোন আইকনে ট্যাপ করে কল করুন, ইমেইল আইকনে ইমেইল পাঠান, বা লোকেশন আইকনে ম্যাপে দেখুন।",
+                            "ℹ️ Tik op telefoonpictogram om te bellen, e-mailpictogram om te e-mailen, of locatiepictogram om op kaart te bekijken.",
                         fontSize = 12.sp,
                         modifier = Modifier.padding(12.dp),
                         color = MaterialTheme.colorScheme.onTertiaryContainer
@@ -353,7 +353,7 @@ private fun InstitutionCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isEnglish) "Call" else "কল",
+                            text = if (isEnglish) "Call" else "Bellen",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.error
@@ -387,7 +387,7 @@ private fun InstitutionCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isEnglish) "Email" else "ইমেইল",
+                            text = if (isEnglish) "Email" else "E-mail",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.primary
@@ -421,7 +421,7 @@ private fun InstitutionCard(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isEnglish) "Map" else "ম্যাপ",
+                            text = if (isEnglish) "Map" else "Kaart",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.secondary
