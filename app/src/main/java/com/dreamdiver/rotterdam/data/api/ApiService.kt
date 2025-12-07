@@ -2,6 +2,7 @@ package com.dreamdiver.rotterdam.data.api
 
 import com.dreamdiver.rotterdam.data.model.AuthResponse
 import com.dreamdiver.rotterdam.data.model.CategoryResponse
+import com.dreamdiver.rotterdam.data.model.CategoryTreeResponse
 import com.dreamdiver.rotterdam.data.model.FeaturedServicesResponse
 import com.dreamdiver.rotterdam.data.model.LoginRequest
 import com.dreamdiver.rotterdam.data.model.ProfileUpdateResponse
@@ -31,6 +32,9 @@ interface ApiService {
 
     @GET("api/v1/subcategories/category/{categoryId}")
     suspend fun getSubCategories(@Path("categoryId") categoryId: Int): SubCategoryResponse
+
+    @GET("api/v1/categories/{categoryId}/tree")
+    suspend fun getCategoryTree(@Path("categoryId") categoryId: Int): CategoryTreeResponse
 
     @GET("api/v1/subcategories/{subcategoryId}/services")
     suspend fun getServicesBySubCategory(@Path("subcategoryId") subcategoryId: Int): SubCategoryServiceResponse

@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
@@ -25,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -50,6 +50,7 @@ import com.dreamdiver.rotterdam.ui.screens.ProfileScreen
 import com.dreamdiver.rotterdam.ui.screens.RegisterScreen
 import com.dreamdiver.rotterdam.ui.screens.ServiceListScreen
 import com.dreamdiver.rotterdam.ui.screens.SubCategoryListScreen
+import com.dreamdiver.rotterdam.ui.screens.NestedSubCategoryListScreen
 import com.dreamdiver.rotterdam.ui.screens.TermsConditionsScreen
 import com.dreamdiver.rotterdam.ui.theme.RotterdamCityTheme
 import com.dreamdiver.rotterdam.ui.viewmodel.AuthViewModel
@@ -104,11 +105,14 @@ fun CumillaCityApp(
     var currentDetailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var serviceListState by rememberSaveable { mutableStateOf<ServiceListState?>(null) }
     var subcategoryListState by rememberSaveable { mutableStateOf<SubCategoryListState?>(null) }
+    var nestedSubcategoryListState by rememberSaveable { mutableStateOf<NestedSubCategoryListState?>(null) }
+    var selectedSubCategory by remember { mutableStateOf<com.dreamdiver.rotterdam.data.model.SubCategory?>(null) }
     var showAuthScreen by rememberSaveable { mutableStateOf<AuthScreen?>(null) }
     var showExitDialog by rememberSaveable { mutableStateOf(false) }
 
     // Get activity context for exit functionality
-    val activity = LocalContext.current as? ComponentActivity
+    val context = LocalContext.current
+    val activity = context as? ComponentActivity
 
     // Handle back button press
     BackHandler(enabled = true) {
@@ -118,6 +122,8 @@ fun CumillaCityApp(
                 currentDetailScreen = null
                 serviceListState = null
                 subcategoryListState = null
+                nestedSubcategoryListState = null
+                selectedSubCategory = null
             }
             // If not on home screen, go to home
             currentDestination != AppDestinations.HOME -> {
@@ -233,6 +239,35 @@ fun CumillaCityApp(
                                 categoryName = subcategoryName
                             )
                             currentDetailScreen = DetailScreen.SERVICE_LIST
+                        },
+                        onNestedSubCategoryClick = { subCategory ->
+                            // Store the full SubCategory object to access its children
+                            selectedSubCategory = subCategory
+                            currentDetailScreen = DetailScreen.NESTED_SUBCATEGORY_LIST
+                        }
+                    )
+                }
+            }
+            DetailScreen.NESTED_SUBCATEGORY_LIST -> {
+                // Show nested subcategory list with children
+                selectedSubCategory?.let { subCategory ->
+                    NestedSubCategoryListScreen(
+                        subCategory = subCategory,
+                        isEnglish = isEnglish,
+                        onBackClick = {
+                            currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
+                            selectedSubCategory = null
+                        },
+                        onSubCategoryClick = { subcategoryId, subcategoryName ->
+                            serviceListState = ServiceListState(
+                                subcategoryId = subcategoryId,
+                                categoryName = subcategoryName
+                            )
+                            currentDetailScreen = DetailScreen.SERVICE_LIST
+                        },
+                        onNestedSubCategoryClick = { childSubCategory ->
+                            // Update to show the child's children
+                            selectedSubCategory = childSubCategory
                         }
                     )
                 }
@@ -282,47 +317,40 @@ fun CumillaCityApp(
                 }
             }
         ) {
-            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                when (currentDestination) {
-                    AppDestinations.HOME -> HomeScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        isEnglish = isEnglish,
-                        onNavigateToEmergency = { currentDetailScreen = DetailScreen.EMERGENCY_SERVICE },
-                        onNavigateToHospital = { currentDetailScreen = DetailScreen.HOSPITAL_LIST },
-                        onNavigateToEducational = { currentDetailScreen = DetailScreen.EDUCATIONAL },
-                        onNavigateToServiceList = { categoryId, categoryName ->
-                            subcategoryListState = SubCategoryListState(categoryId, categoryName)
-                            currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
-                        },
-                        viewModel = homeViewModel
-                    )
-                    AppDestinations.FAVORITES -> FavoritesScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                    AppDestinations.PROFILE -> {
-                        if (preferencesManager != null && authViewModel != null) {
-                            ProfileScreen(
-                                modifier = Modifier.padding(innerPadding),
-                                preferencesManager = preferencesManager,
-                                authViewModel = authViewModel,
-                                onLogout = { authViewModel.logout() },
-                                onEditProfile = { currentDetailScreen = DetailScreen.EDIT_PROFILE },
-                                onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
-                                onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
-                                isEnglish = isEnglish
-                            )
-                        }
+            when (currentDestination) {
+                AppDestinations.HOME -> HomeScreen(
+                    isEnglish = isEnglish,
+                    onNavigateToEmergency = { currentDetailScreen = DetailScreen.EMERGENCY_SERVICE },
+                    onNavigateToHospital = { currentDetailScreen = DetailScreen.HOSPITAL_LIST },
+                    onNavigateToEducational = { currentDetailScreen = DetailScreen.EDUCATIONAL },
+                    onNavigateToServiceList = { categoryId, categoryName ->
+                        subcategoryListState = SubCategoryListState(categoryId, categoryName)
+                        currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
+                    },
+                    viewModel = homeViewModel
+                )
+                AppDestinations.FAVORITES -> FavoritesScreen()
+                AppDestinations.PROFILE -> {
+                    if (preferencesManager != null && authViewModel != null) {
+                        ProfileScreen(
+                            preferencesManager = preferencesManager,
+                            authViewModel = authViewModel,
+                            onLogout = { authViewModel.logout() },
+                            onEditProfile = { currentDetailScreen = DetailScreen.EDIT_PROFILE },
+                            onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
+                            onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
+                            isEnglish = isEnglish
+                        )
                     }
-                    AppDestinations.MORE -> MoreScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        isEnglish = isEnglish,
-                        onLanguageChange = onLanguageChange,
-                        onNavigateToNotice = { currentDetailScreen = DetailScreen.NOTICE },
-                        onNavigateToAbout = { currentDetailScreen = DetailScreen.ABOUT_US },
-                        onNavigateToPrivacy = { currentDetailScreen = DetailScreen.PRIVACY_POLICY },
-                        onNavigateToTerms = { currentDetailScreen = DetailScreen.TERMS_CONDITIONS }
-                    )
                 }
+                AppDestinations.MORE -> MoreScreen(
+                    isEnglish = isEnglish,
+                    onLanguageChange = onLanguageChange,
+                    onNavigateToNotice = { currentDetailScreen = DetailScreen.NOTICE },
+                    onNavigateToAbout = { currentDetailScreen = DetailScreen.ABOUT_US },
+                    onNavigateToPrivacy = { currentDetailScreen = DetailScreen.PRIVACY_POLICY },
+                    onNavigateToTerms = { currentDetailScreen = DetailScreen.TERMS_CONDITIONS }
+                )
             }
         }
     }
@@ -356,6 +384,7 @@ enum class DetailScreen {
     HOSPITAL_LIST,
     EDUCATIONAL,
     SUBCATEGORY_LIST,
+    NESTED_SUBCATEGORY_LIST,
     SERVICE_LIST,
     EDIT_PROFILE
 }
@@ -378,6 +407,13 @@ data class ServiceListState(
 data class SubCategoryListState(
     val categoryId: Int,
     val categoryName: String
+) : Parcelable
+
+// State holder for nested subcategory navigation
+@Parcelize
+data class NestedSubCategoryListState(
+    val subcategoryId: Int,
+    val subcategoryName: String
 ) : Parcelable
 
 @Composable

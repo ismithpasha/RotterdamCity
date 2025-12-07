@@ -55,6 +55,7 @@ fun SubCategoryListScreen(
     isEnglish: Boolean = true,
     onBackClick: () -> Unit = {},
     onSubCategoryClick: (Int, String) -> Unit = { _, _ -> },
+    onNestedSubCategoryClick: (SubCategory) -> Unit = {},
     viewModel: SubCategoryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -108,7 +109,18 @@ fun SubCategoryListScreen(
                         SubCategoryCard(
                             subCategory = subCategory,
                             onClick = {
-                                onSubCategoryClick(subCategory.id, subCategory.name)
+                                // Safe name for navigation
+                                val safeName = subCategory.nameEn?.takeIf { it.isNotBlank() }
+                                    ?: subCategory.name?.takeIf { it.isNotBlank() }
+                                    ?: "Unnamed"
+
+                                // If has children, navigate to nested subcategories
+                                if (subCategory.children.isNotEmpty()) {
+                                    onNestedSubCategoryClick(subCategory)
+                                } else {
+                                    // Otherwise, navigate to services
+                                    onSubCategoryClick(subCategory.id, safeName)
+                                }
                             }
                         )
                     }
@@ -141,12 +153,94 @@ fun SubCategoryListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NestedSubCategoryListScreen(
+    subCategory: SubCategory,
+    isEnglish: Boolean = true,
+    onBackClick: () -> Unit = {},
+    onSubCategoryClick: (Int, String) -> Unit = { _, _ -> },
+    onNestedSubCategoryClick: (SubCategory) -> Unit = {}
+) {
+    // Safe name extraction with fallbacks
+    val displayName = subCategory.nameEn?.takeIf { it.isNotBlank() }
+        ?: subCategory.name?.takeIf { it.isNotBlank() }
+        ?: "Unnamed"
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(displayName) },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { padding ->
+        if (subCategory.children.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No subcategories available")
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(subCategory.children) { childSubCategory ->
+                    SubCategoryCard(
+                        subCategory = childSubCategory,
+                        onClick = {
+                            // Safe name for navigation
+                            val childName = childSubCategory.nameEn?.takeIf { it.isNotBlank() }
+                                ?: childSubCategory.name?.takeIf { it.isNotBlank() }
+                                ?: "Unnamed"
+
+                            // If has children, navigate to nested subcategories
+                            if (childSubCategory.children.isNotEmpty()) {
+                                onNestedSubCategoryClick(childSubCategory)
+                            } else {
+                                // Otherwise, navigate to services
+                                onSubCategoryClick(childSubCategory.id, childName)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun SubCategoryCard(
     subCategory: SubCategory,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Safe name extraction with fallbacks
+    val displayName = subCategory.nameEn?.takeIf { it.isNotBlank() }
+        ?: subCategory.name?.takeIf { it.isNotBlank() }
+        ?: "Unnamed"
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -165,10 +259,14 @@ fun SubCategoryCard(
             verticalArrangement = Arrangement.Center
         ) {
             // Load icon from URL using Coil
-            if (!subCategory.iconUrl.isNullOrBlank()) {
+            val iconUrl = subCategory.iconUrl ?: subCategory.icon?.let {
+                "https://rotterdam.dreamdiver.nl/storage/$it"
+            }
+
+            if (!iconUrl.isNullOrBlank()) {
                 AsyncImage(
-                    model = subCategory.iconUrl,
-                    contentDescription = subCategory.name,
+                    model = iconUrl,
+                    contentDescription = displayName,
                     modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Fit
                 )
@@ -179,7 +277,7 @@ fun SubCategoryCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = subCategory.name.take(2).uppercase(),
+                        text = displayName.take(2).uppercase(),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -190,7 +288,7 @@ fun SubCategoryCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = subCategory.name,
+                text = displayName,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,

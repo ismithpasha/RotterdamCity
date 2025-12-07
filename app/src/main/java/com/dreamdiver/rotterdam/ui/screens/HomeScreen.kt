@@ -342,6 +342,15 @@ fun FeaturedServiceCard(
     isEnglish: Boolean,
     onClick: () -> Unit
 ) {
+    // Safe name extraction with fallback - handle nulls first
+    val displayName = if (isEnglish) {
+        service.nameEn?.takeIf { it.isNotBlank() }
+            ?: service.name?.takeIf { it.isNotBlank() }
+            ?: "Unnamed"
+    } else {
+        service.name?.takeIf { it.isNotBlank() } ?: "Unnamed"
+    }
+
     Card(
         modifier = Modifier
             .width(85.dp)
@@ -371,7 +380,7 @@ fun FeaturedServiceCard(
             ) {
                 AsyncImage(
                     model = service.category.icon,
-                    contentDescription = service.name,
+                    contentDescription = displayName,
                     modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.Fit
                 )
@@ -380,7 +389,7 @@ fun FeaturedServiceCard(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = if (isEnglish) (service.nameEn ?: service.name) else service.name,
+                text = displayName,
                 fontSize = 11.sp,
                 color = Color(0xFF2E3A59),
                 fontWeight = FontWeight.SemiBold,
@@ -433,6 +442,15 @@ fun TrendingCard(
     isEnglish: Boolean,
     onClick: () -> Unit
 ) {
+    // Safe title extraction with fallback - handle nulls first
+    val displayTitle = if (isEnglish) {
+        item.titleEn?.takeIf { it.isNotBlank() }
+            ?: item.title?.takeIf { it.isNotBlank() }
+            ?: "Untitled"
+    } else {
+        item.title?.takeIf { it.isNotBlank() } ?: "Untitled"
+    }
+
     Card(
         modifier = Modifier
             .width(280.dp)
@@ -444,7 +462,7 @@ fun TrendingCard(
         Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
                 model = item.image,
-                contentDescription = item.title,
+                contentDescription = displayTitle,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
                 alpha = 0.3f
@@ -457,7 +475,7 @@ fun TrendingCard(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = if (isEnglish) (item.titleEn ?: item.title) else item.title,
+                    text = displayTitle,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -466,7 +484,7 @@ fun TrendingCard(
                 )
 
                 Text(
-                    text = item.createdAt.take(10),
+                    text = item.createdAt?.take(10) ?: "",
                     fontSize = 12.sp,
                     color = Color.White
                 )
@@ -494,6 +512,31 @@ fun TrendingDetailModal(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Safe string extractions with fallbacks - handle nulls first
+    val displayTitle = if (isEnglish) {
+        trendingItem.titleEn?.takeIf { it.isNotBlank() }
+            ?: trendingItem.title?.takeIf { it.isNotBlank() }
+            ?: "Untitled"
+    } else {
+        trendingItem.title?.takeIf { it.isNotBlank() } ?: "Untitled"
+    }
+
+    val displaySummary = if (isEnglish) {
+        trendingItem.summaryEn?.takeIf { it.isNotBlank() }
+            ?: trendingItem.summary?.takeIf { it.isNotBlank() }
+            ?: "No summary available"
+    } else {
+        trendingItem.summary?.takeIf { it.isNotBlank() } ?: "No summary available"
+    }
+
+    val displayDetails = if (isEnglish) {
+        trendingItem.detailsEn?.takeIf { it.isNotBlank() }
+            ?: trendingItem.details?.takeIf { it.isNotBlank() }
+            ?: "No details available"
+    } else {
+        trendingItem.details?.takeIf { it.isNotBlank() } ?: "No details available"
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -530,7 +573,7 @@ fun TrendingDetailModal(
             // Trending Image
             AsyncImage(
                 model = trendingItem.image,
-                contentDescription = if (isEnglish) (trendingItem.titleEn ?: trendingItem.title) else trendingItem.title,
+                contentDescription = displayTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -543,7 +586,7 @@ fun TrendingDetailModal(
 
             // Title
             Text(
-                text = if (isEnglish) (trendingItem.titleEn ?: trendingItem.title) else trendingItem.title,
+                text = displayTitle,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -554,7 +597,7 @@ fun TrendingDetailModal(
 
             // Date
             Text(
-                text = "Published: ${trendingItem.createdAt.take(10)}",
+                text = "Published: ${trendingItem.createdAt?.take(10) ?: "Unknown"}",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -572,7 +615,7 @@ fun TrendingDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (isEnglish) (trendingItem.summaryEn ?: trendingItem.summary) else trendingItem.summary,
+                text = displaySummary,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -590,7 +633,7 @@ fun TrendingDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (isEnglish) (trendingItem.detailsEn ?: trendingItem.details) else trendingItem.details,
+                text = displayDetails,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -662,6 +705,31 @@ fun SliderDetailModal(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    // Safe string extractions with fallbacks - handle nulls first
+    val displayTitle = if (isEnglish) {
+        slider.titleEn?.takeIf { it.isNotBlank() }
+            ?: slider.title?.takeIf { it.isNotBlank() }
+            ?: "Untitled"
+    } else {
+        slider.title?.takeIf { it.isNotBlank() } ?: "Untitled"
+    }
+
+    val displayShortDetails = if (isEnglish) {
+        slider.shortDetailsEn?.takeIf { it.isNotBlank() }
+            ?: slider.shortDetails?.takeIf { it.isNotBlank() }
+            ?: "No summary available"
+    } else {
+        slider.shortDetails?.takeIf { it.isNotBlank() } ?: "No summary available"
+    }
+
+    val displayDetails = if (isEnglish) {
+        slider.detailsEn?.takeIf { it.isNotBlank() }
+            ?: slider.details?.takeIf { it.isNotBlank() }
+            ?: "No details available"
+    } else {
+        slider.details?.takeIf { it.isNotBlank() } ?: "No details available"
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
@@ -697,7 +765,7 @@ fun SliderDetailModal(
             // Slider Image
             AsyncImage(
                 model = slider.image,
-                contentDescription = if (isEnglish) (slider.titleEn ?: slider.title) else slider.title,
+                contentDescription = displayTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
@@ -710,7 +778,7 @@ fun SliderDetailModal(
 
             // Title
             Text(
-                text = if (isEnglish) (slider.titleEn ?: slider.title) else slider.title,
+                text = displayTitle,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -721,7 +789,7 @@ fun SliderDetailModal(
 
             // Date
             Text(
-                text = "Created: ${slider.createdAt.take(10)}",
+                text = "Created: ${slider.createdAt?.take(10) ?: "Unknown"}",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -739,7 +807,7 @@ fun SliderDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (isEnglish) (slider.shortDetailsEn ?: slider.shortDetails) else slider.shortDetails,
+                text = displayShortDetails,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -757,7 +825,7 @@ fun SliderDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (isEnglish) (slider.detailsEn ?: slider.details) else slider.details,
+                text = displayDetails,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)

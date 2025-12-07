@@ -7,6 +7,19 @@ import com.dreamdiver.rotterdam.data.model.SubCategory
 class SubCategoryRepository {
     private val apiService = RetrofitInstance.api
 
+    suspend fun getCategoryTree(categoryId: Int): Result<List<SubCategory>> {
+        return try {
+            val response = apiService.getCategoryTree(categoryId)
+            if (response.success) {
+                Result.success(response.data.subcategories)
+            } else {
+                Result.failure(Exception("Failed to load category tree"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun getSubCategories(categoryId: Int): Result<List<SubCategory>> {
         return try {
             val response = apiService.getSubCategories(categoryId)

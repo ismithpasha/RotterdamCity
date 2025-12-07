@@ -11,18 +11,18 @@ data class CategoryResponse(
 
 data class Category(
     val id: Int,
-    val name: String,
+    val name: String = "",
     @SerializedName("name_en")
     val nameEn: String? = null,
     @SerializedName(value = "icon", alternate = ["icon_url"])  // Handle both field names
-    val icon: String,
-    val status: String,
+    val icon: String = "",
+    val status: String = "",
     @SerializedName("services_count")
     val servicesCount: Int? = null,  // Optional since nested categories may not have this
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String = ""
 )
 
 data class SliderResponse(
@@ -35,24 +35,24 @@ data class SliderResponse(
 
 data class Slider(
     val id: Int,
-    val title: String,
+    val title: String? = null,
     @SerializedName("title_en")
     val titleEn: String? = null,
     @SerializedName("short_details")
-    val shortDetails: String,
+    val shortDetails: String? = null,
     @SerializedName("short_details_en")
     val shortDetailsEn: String? = null,
-    val details: String,
+    val details: String? = null,
     @SerializedName("details_en")
     val detailsEn: String? = null,
-    val image: String,
-    val order: Int,
-    val status: String,
+    val image: String? = null,
+    val order: Int = 0,
+    val status: String? = null,
     val locale: String? = null,
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String? = null,
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String? = null
 )
 
 data class ServiceResponse(
@@ -68,28 +68,28 @@ data class Service(
     @SerializedName("category_id")
     val categoryId: Int,
     val category: Category,
-    val name: String,
+    val name: String? = null,
     @SerializedName("name_en")
     val nameEn: String? = null,
-    val phone: String,
-    val address: String,
+    val phone: String = "",
+    val address: String = "",
     @SerializedName("address_en")
     val addressEn: String? = null,
-    val latitude: String?,
-    val longitude: String?,
+    val latitude: String? = null,
+    val longitude: String? = null,
     @SerializedName("google_maps_url")
-    val googleMapsUrl: String?,
-    val description: String,
+    val googleMapsUrl: String? = null,
+    val description: String = "",
     @SerializedName("description_en")
     val descriptionEn: String? = null,
     @SerializedName("image")
-    val image: String?,
-    val status: String,
+    val image: String? = null,
+    val status: String = "",
     val locale: String? = null,
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String = ""
 )
 
 data class ServiceDetailResponse(
@@ -104,28 +104,28 @@ data class ServiceDetail(
     @SerializedName("category_id")
     val categoryId: Int,
     val category: Category,
-    val name: String,
+    val name: String? = null,
     @SerializedName("name_en")
     val nameEn: String? = null,
-    val phone: String,
-    val address: String,
+    val phone: String = "",
+    val address: String = "",
     @SerializedName("address_en")
     val addressEn: String? = null,
-    val latitude: String?,
-    val longitude: String?,
+    val latitude: String? = null,
+    val longitude: String? = null,
     @SerializedName("google_maps_url")
-    val googleMapsUrl: String?,
-    val description: String,
+    val googleMapsUrl: String? = null,
+    val description: String = "",
     @SerializedName("description_en")
     val descriptionEn: String? = null,
     @SerializedName("image")
-    val image: String?,
-    val status: String,
+    val image: String? = null,
+    val status: String = "",
     val locale: String? = null,
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String = "",
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String = ""
 )
 
 // Featured Services Response
@@ -146,22 +146,22 @@ data class TrendingResponse(
 
 data class TrendingItem(
     val id: Int,
-    val title: String,
+    val title: String? = null,
     @SerializedName("title_en")
     val titleEn: String? = null,
-    val summary: String,
+    val summary: String? = null,
     @SerializedName("summary_en")
     val summaryEn: String? = null,
-    val details: String,
+    val details: String? = null,
     @SerializedName("details_en")
     val detailsEn: String? = null,
-    val url: String?,
-    val image: String,
-    val status: String,
-    val order: Int,
+    val url: String? = null,
+    val image: String? = null,
+    val status: String? = null,
+    val order: Int = 0,
     val locale: String? = null,
     @SerializedName("created_at")
-    val createdAt: String,
+    val createdAt: String? = null,
     @SerializedName("updated_at")
-    val updatedAt: String
+    val updatedAt: String? = null
 )

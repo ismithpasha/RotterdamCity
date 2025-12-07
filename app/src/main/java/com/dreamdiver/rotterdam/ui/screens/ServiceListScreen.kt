@@ -219,7 +219,7 @@ fun ServiceCard(
             // Service Image
             AsyncImage(
                 model = service.image?.takeIf { it.isNotEmpty() } ?: service.category?.icon,
-                contentDescription = service.name,
+                contentDescription = service.name ?: "Service image",
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -234,7 +234,7 @@ fun ServiceCard(
             ) {
                 // Service Name
                 Text(
-                    text = service.name,
+                    text = service.name ?: "Unnamed Service",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -312,7 +312,7 @@ fun ServiceDetailModal(
             // Service Image
             AsyncImage(
                 model = serviceDetail.image?.takeIf { it.isNotEmpty() } ?: serviceDetail.category?.icon,
-                contentDescription = serviceDetail.name,
+                contentDescription = serviceDetail.name ?: "Service image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -325,7 +325,7 @@ fun ServiceDetailModal(
 
             // Service Name
             Text(
-                text = serviceDetail.name,
+                text = serviceDetail.name ?: "Unnamed Service",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -355,7 +355,7 @@ fun ServiceDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = serviceDetail.description,
+                text = serviceDetail.description.takeIf { it.isNotEmpty() } ?: "No description available",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)

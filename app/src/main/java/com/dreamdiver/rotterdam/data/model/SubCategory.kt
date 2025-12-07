@@ -8,15 +8,38 @@ data class SubCategoryResponse(
     val locale: String? = null
 )
 
-data class SubCategory(
+data class CategoryTreeResponse(
+    val success: Boolean,
+    val data: CategoryTree,
+    val locale: String? = null,
+    val message: String? = null
+)
+
+data class CategoryTree(
     val id: Int,
     val name: String,
     @SerializedName("name_en")
     val nameEn: String? = null,
+    val icon: String? = null,
     @SerializedName("icon_url")
     val iconUrl: String?,
+    val status: String,
+    val subcategories: List<SubCategory>
+)
+
+data class SubCategory(
+    val id: Int,
+    val name: String = "",
+    @SerializedName("name_en")
+    val nameEn: String? = null,
+    val icon: String? = null,
+    @SerializedName("icon_url")
+    val iconUrl: String? = null,
+    val status: String = "",
+    val depth: Int = 0,
+    val children: List<SubCategory> = emptyList(),
     @SerializedName("services_count")
-    val servicesCount: Int
+    val servicesCount: Int? = null
 )
 
 data class SubCategoryServiceResponse(

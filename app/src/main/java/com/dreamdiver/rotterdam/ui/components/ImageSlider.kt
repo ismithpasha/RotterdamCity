@@ -179,7 +179,7 @@ private fun SliderItemCard(
             // Load slider image from URL
             AsyncImage(
                 model = slider.image,
-                contentDescription = slider.title,
+                contentDescription = slider.title ?: "Slider image",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
@@ -206,17 +206,18 @@ private fun SliderItemCard(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = slider.title,
+                    text = slider.title ?: "Untitled",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                if (slider.shortDetails.isNotEmpty()) {
+                val shortDetails = slider.shortDetails
+                if (!shortDetails.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = slider.shortDetails,
+                        text = shortDetails,
                         fontSize = 14.sp,
                         color = Color.White.copy(alpha = 0.9f),
                         maxLines = 2,

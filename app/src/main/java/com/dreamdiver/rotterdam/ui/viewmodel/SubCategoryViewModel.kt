@@ -19,13 +19,21 @@ class SubCategoryViewModel(
     fun loadSubCategories(categoryId: Int, categoryName: String) {
         viewModelScope.launch {
             _uiState.value = SubCategoryUiState.Loading
-            repository.getSubCategories(categoryId)
+            repository.getCategoryTree(categoryId)
                 .onSuccess { subCategories ->
                     _uiState.value = SubCategoryUiState.Success(categoryName, subCategories)
                 }
                 .onFailure { error ->
                     _uiState.value = SubCategoryUiState.Error(error.message ?: "Unknown error")
                 }
+        }
+    }
+
+    fun loadNestedSubCategories(subCategory: SubCategory) {
+        viewModelScope.launch {
+            _uiState.value = SubCategoryUiState.Loading
+            // Load the children of the subcategory
+            _uiState.value = SubCategoryUiState.Success(subCategory.name, subCategory.children)
         }
     }
 }
