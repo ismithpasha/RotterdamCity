@@ -135,7 +135,7 @@ fun EditProfileScreen(
                 title = { Text(if (isEnglish) "Edit Profile" else "Profiel Bewerken") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = if (isEnglish) "Back" else "Terug")
                     }
                 }
             )

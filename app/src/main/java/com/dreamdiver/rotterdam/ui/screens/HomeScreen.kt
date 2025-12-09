@@ -172,7 +172,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { viewModel.loadCategories() }) {
-                            Text("Retry")
+                            Text(if (isEnglish) "Retry" else "Opnieuw proberen")
                         }
                     }
                 }
@@ -192,7 +192,13 @@ fun HomeScreen(
             TextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search for anything", color = Color.Gray, fontSize = 14.sp) },
+                placeholder = {
+                    Text(
+                        if (isEnglish) "Search for anything" else "Zoek naar alles",
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -313,7 +319,7 @@ fun FeaturedServicesSection(
                 .padding(16.dp)
         ) {
             Text(
-                text = "— Frequently used —",
+                text = if (isEnglish) "— Frequently used —" else "— Vaak gebruikt —",
                 fontSize = 12.sp,
                 color = Color(0xFF7C8BA0),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -379,7 +385,7 @@ fun FeaturedServiceCard(
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(
-                    model = service.category.icon,
+                    model = service.category?.icon,
                     contentDescription = displayName,
                     modifier = Modifier.size(24.dp),
                     contentScale = ContentScale.Fit
@@ -415,7 +421,7 @@ fun TrendingSection(
             .padding(16.dp)
     ) {
         Text(
-            text = "Trending on",
+            text = if (isEnglish) "Trending on" else "Trending",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
@@ -557,7 +563,7 @@ fun TrendingDetailModal(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Trending Details",
+                    text = if (isEnglish) "Trending Details" else "Trending Details",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -565,7 +571,7 @@ fun TrendingDetailModal(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close"
+                        contentDescription = if (isEnglish) "Close" else "Sluiten"
                     )
                 }
             }
@@ -597,7 +603,10 @@ fun TrendingDetailModal(
 
             // Date
             Text(
-                text = "Published: ${trendingItem.createdAt?.take(10) ?: "Unknown"}",
+                text = if (isEnglish)
+                    "Published: ${trendingItem.createdAt?.take(10) ?: "Unknown"}"
+                else
+                    "Gepubliceerd: ${trendingItem.createdAt?.take(10) ?: "Onbekend"}",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -607,7 +616,7 @@ fun TrendingDetailModal(
 
             // Summary Section
             Text(
-                text = "Summary",
+                text = if (isEnglish) "Summary" else "Samenvatting",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -625,7 +634,7 @@ fun TrendingDetailModal(
 
             // Details Section
             Text(
-                text = "Details",
+                text = if (isEnglish) "Details" else "Details",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -633,9 +642,9 @@ fun TrendingDetailModal(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = displayDetails,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = if (isEnglish) "All Services" else "Alle Diensten",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
@@ -676,13 +685,13 @@ fun TrendingDetailModal(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
-                                        text = "Read Full Article",
+                                        text = if (isEnglish) "Read Full Article" else "Lees volledig artikel",
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        text = "Open in browser",
+                                        text = if (isEnglish) "Open in browser" else "Open in browser",
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -749,7 +758,7 @@ fun SliderDetailModal(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Slider Details",
+                    text = if (isEnglish) "Slider Details" else "Slider Details",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -757,7 +766,7 @@ fun SliderDetailModal(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close"
+                        contentDescription = if (isEnglish) "Close" else "Sluiten"
                     )
                 }
             }
@@ -789,7 +798,10 @@ fun SliderDetailModal(
 
             // Date
             Text(
-                text = "Created: ${slider.createdAt?.take(10) ?: "Unknown"}",
+                text = if (isEnglish)
+                    "Created: ${slider.createdAt?.take(10) ?: "Unknown"}"
+                else
+                    "Aangemaakt: ${slider.createdAt?.take(10) ?: "Onbekend"}",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -799,7 +811,7 @@ fun SliderDetailModal(
 
             // Short Details Section
             Text(
-                text = "Summary",
+                text = if (isEnglish) "Summary" else "Samenvatting",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -817,7 +829,7 @@ fun SliderDetailModal(
 
             // Full Details Section
             Text(
-                text = "Full Details",
+                text = if (isEnglish) "Full Details" else "Volledige Details",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -854,7 +866,7 @@ fun AllServicesSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "All Services",
+                text = if (isEnglish) "All Services" else "Alle Diensten",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )

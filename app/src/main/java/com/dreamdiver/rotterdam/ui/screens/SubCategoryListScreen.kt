@@ -72,7 +72,7 @@ fun SubCategoryListScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = if (isEnglish) "Back" else "Terug"
                         )
                     }
                 },
@@ -175,7 +175,7 @@ fun NestedSubCategoryListScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = if (isEnglish) "Back" else "Terug"
                         )
                     }
                 },
@@ -194,7 +194,7 @@ fun NestedSubCategoryListScreen(
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No subcategories available")
+                Text(if (isEnglish) "No subcategories available" else "Geen subcategorieën beschikbaar")
             }
         } else {
             LazyVerticalGrid(

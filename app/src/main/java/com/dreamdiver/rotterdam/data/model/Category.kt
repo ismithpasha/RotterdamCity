@@ -67,7 +67,7 @@ data class Service(
     val id: Int,
     @SerializedName("category_id")
     val categoryId: Int,
-    val category: Category,
+    val category: Category? = null,
     val name: String? = null,
     @SerializedName("name_en")
     val nameEn: String? = null,
@@ -103,14 +103,18 @@ data class ServiceDetail(
     val id: Int,
     @SerializedName("category_id")
     val categoryId: Int,
-    val category: Category,
+    val category: Category? = null,
     val name: String? = null,
     @SerializedName("name_en")
     val nameEn: String? = null,
+    @SerializedName("name_nl")
+    val nameNl: String? = null,
     val phone: String = "",
     val address: String = "",
     @SerializedName("address_en")
     val addressEn: String? = null,
+    @SerializedName("address_nl")
+    val addressNl: String? = null,
     val latitude: String? = null,
     val longitude: String? = null,
     @SerializedName("google_maps_url")
@@ -118,14 +122,34 @@ data class ServiceDetail(
     val description: String = "",
     @SerializedName("description_en")
     val descriptionEn: String? = null,
+    @SerializedName("description_nl")
+    val descriptionNl: String? = null,
+    val descriptions: List<ServiceDescription> = emptyList(),
     @SerializedName("image")
     val image: String? = null,
+    val url: String? = null,
     val status: String = "",
     val locale: String? = null,
     @SerializedName("created_at")
     val createdAt: String = "",
     @SerializedName("updated_at")
     val updatedAt: String = ""
+)
+
+data class ServiceDescription(
+    val id: Int,
+    @SerializedName("tab_title")
+    val tabTitle: String? = null,
+    @SerializedName("tab_title_en")
+    val tabTitleEn: String? = null,
+    @SerializedName("tab_title_nl")
+    val tabTitleNl: String? = null,
+    val content: String? = null,
+    @SerializedName("content_en")
+    val contentEn: String? = null,
+    @SerializedName("content_nl")
+    val contentNl: String? = null,
+    val order: Int = 0
 )
 
 // Featured Services Response

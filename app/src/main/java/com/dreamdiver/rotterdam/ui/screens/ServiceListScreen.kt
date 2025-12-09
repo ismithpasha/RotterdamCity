@@ -2,6 +2,8 @@ package com.dreamdiver.rotterdam.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,21 +26,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -52,15 +59,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.dreamdiver.rotterdam.R
 import com.dreamdiver.rotterdam.data.model.Service
 import com.dreamdiver.rotterdam.ui.viewmodel.ServiceUiState
 import com.dreamdiver.rotterdam.ui.viewmodel.ServiceViewModel
@@ -97,6 +108,7 @@ fun ServiceListScreen(
     if (detailState is com.dreamdiver.rotterdam.ui.viewmodel.ServiceDetailState.Success) {
         ServiceDetailModal(
             serviceDetail = (detailState as com.dreamdiver.rotterdam.ui.viewmodel.ServiceDetailState.Success).serviceDetail,
+            isEnglish = isEnglish,
             onDismiss = {
                 selectedServiceId = null
                 viewModel.clearServiceDetail()
@@ -112,7 +124,7 @@ fun ServiceListScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = if (isEnglish) "Back" else "Terug"
                         )
                     }
                 },
@@ -143,7 +155,7 @@ fun ServiceListScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No services available",
+                            text = if (isEnglish) "No services available" else "Geen diensten beschikbaar",
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -219,7 +231,7 @@ fun ServiceCard(
             // Service Image
             AsyncImage(
                 model = service.image?.takeIf { it.isNotEmpty() } ?: service.category?.icon,
-                contentDescription = service.name ?: "Service image",
+                contentDescription = service.name,
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -272,228 +284,402 @@ fun ServiceCard(
 @Composable
 fun ServiceDetailModal(
     serviceDetail: com.dreamdiver.rotterdam.data.model.ServiceDetail,
+    isEnglish: Boolean = true,
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    // Helper function to get localized text
+    fun getLocalizedText(en: String?, nl: String?, fallback: String?): String {
+        return if (isEnglish) {
+            en?.takeIf { it.isNotBlank() } ?: fallback?.takeIf { it.isNotBlank() } ?: ""
+        } else {
+            nl?.takeIf { it.isNotBlank() } ?: fallback?.takeIf { it.isNotBlank() } ?: ""
+        }
+    }
+
+    val serviceName = getLocalizedText(serviceDetail.nameEn, serviceDetail.nameNl, serviceDetail.name)
+    val serviceAddress = getLocalizedText(serviceDetail.addressEn, serviceDetail.addressNl, serviceDetail.address)
+    val serviceDescription = getLocalizedText(serviceDetail.descriptionEn, serviceDetail.descriptionNl, serviceDetail.description)
+
+    // Prepare tabs from descriptions array
+    val tabs = if (serviceDetail.descriptions.isNotEmpty()) {
+        serviceDetail.descriptions.sortedBy { it.order }
+    } else {
+        // Default tabs if no descriptions array
+        listOf(
+            com.dreamdiver.rotterdam.data.model.ServiceDescription(
+                id = 1,
+                tabTitleEn = "Overview",
+                tabTitleNl = "Overzicht",
+                contentEn = serviceDescription,
+                contentNl = serviceDescription,
+                order = 0
+            ),
+            com.dreamdiver.rotterdam.data.model.ServiceDescription(
+                id = 2,
+                tabTitleEn = "Contact",
+                tabTitleNl = "Contact",
+                contentEn = "Phone: ${serviceDetail.phone}\n\nAddress: $serviceAddress",
+                contentNl = "Telefoon: ${serviceDetail.phone}\n\nAdres: $serviceAddress",
+                order = 1
+            )
+        )
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
+        containerColor = Color.White
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 32.dp)
+                .fillMaxHeight(0.95f)
         ) {
-            // Header with close button
+            // Header with back button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Service Details",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
                 IconButton(onClick = onDismiss) {
                     Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close"
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Close",
+                        tint = Color.Black
                     )
                 }
             }
 
-            // Service Image
-            AsyncImage(
-                model = serviceDetail.image?.takeIf { it.isNotEmpty() } ?: serviceDetail.category?.icon,
-                contentDescription = serviceDetail.name ?: "Service image",
+            // Hero Card with Service Image
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
+                    .height(160.dp)
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF1E5A4C)
+                )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Background image
+                    val imageUrl = serviceDetail.image?.takeIf { it.isNotBlank() }
+                        ?: serviceDetail.category?.icon
+
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = serviceName,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(id = R.drawable.ic_launcher_background)
+                    )
+
+                    // Dark overlay
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.4f))
+                    )
+
+                    // Service name centered
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = serviceName,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Service Name
+            // Service Name and Category
             Text(
-                text = serviceDetail.name ?: "Unnamed Service",
-                fontSize = 24.sp,
+                text = serviceName,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color(0xFF1E1E1E),
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Category
-            Text(
-                text = serviceDetail.category.name,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Description
-            Text(
-                text = "Description",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = serviceDetail.description.takeIf { it.isNotEmpty() } ?: "No description available",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Phone Number
-            if (serviceDetail.phone.isNotEmpty()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+            // Category with icon (only show if category exists)
+            serviceDetail.category?.let { category ->
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Call,
-                                contentDescription = "Phone",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = "Phone Number",
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = serviceDetail.phone,
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
-                        FilledTonalButton(
-                            onClick = {
-                                val intent = Intent(Intent.ACTION_DIAL).apply {
-                                    data = Uri.parse("tel:${serviceDetail.phone}")
-                                }
-                                context.startActivity(intent)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Call,
-                                contentDescription = "Call",
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Call")
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            // Address
-            if (serviceDetail.address.isNotEmpty()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = "Location",
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(24.dp)
+                    if (category.icon.isNotBlank()) {
+                        AsyncImage(
+                            model = category.icon,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            error = painterResource(id = R.drawable.ic_launcher_background)
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Address",
-                                fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = serviceDetail.address,
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurface
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = category.name,
+                        fontSize = 14.sp,
+                        color = Color(0xFF666666)
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Tabs
+            if (tabs.isNotEmpty()) {
+                var selectedTabIndex by remember { mutableStateOf(0) }
+
+                // Tab Row
+                ScrollableTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF0083CA),
+                    edgePadding = 16.dp,
+                    indicator = { tabPositions ->
+                        if (selectedTabIndex < tabPositions.size) {
+                            TabRowDefaults.SecondaryIndicator(
+                                Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                                color = Color(0xFF0083CA)
                             )
                         }
                     }
+                ) {
+                    tabs.forEachIndexed { index, tab ->
+                        val tabTitle = getLocalizedText(tab.tabTitleEn, tab.tabTitleNl, tab.tabTitle)
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = {
+                                Text(
+                                    text = tabTitle,
+                                    fontWeight = if (selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal
+                                )
+                            }
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
-            }
 
-            // Google Maps Button (if lat/lng or URL available)
-            val hasLocation = (!serviceDetail.latitude.isNullOrEmpty() && !serviceDetail.longitude.isNullOrEmpty())
-                           || !serviceDetail.googleMapsUrl.isNullOrEmpty()
+                Divider(color = Color(0xFFEEEEEE))
 
-            if (hasLocation) {
-                OutlinedButton(
-                    onClick = {
-                        val mapUri = if (!serviceDetail.latitude.isNullOrEmpty() && !serviceDetail.longitude.isNullOrEmpty()) {
-                            // Use lat/lng if available
-                            "geo:${serviceDetail.latitude},${serviceDetail.longitude}?q=${serviceDetail.latitude},${serviceDetail.longitude}(${serviceDetail.name})"
-                        } else {
-                            // Fallback to google maps URL
-                            serviceDetail.googleMapsUrl ?: ""
-                        }
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUri))
-                        context.startActivity(intent)
-                    },
+                // Tab Content
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Map,
-                        contentDescription = "Map",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Open in Google Maps")
+                    val currentTab = tabs[selectedTabIndex]
+                    val tabContent = getLocalizedText(currentTab.contentEn, currentTab.contentNl, currentTab.content)
+
+                    // Description Section
+                    if (tabContent.isNotBlank()) {
+                        Text(
+                            text = if (isEnglish) "Description" else "Beschrijving",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1E1E1E)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = tabContent,
+                            fontSize = 15.sp,
+                            color = Color(0xFF1E1E1E),
+                            lineHeight = 22.sp
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // Address Section
+                    if (serviceAddress.isNotBlank()) {
+                        Text(
+                            text = if (isEnglish) "Address" else "Adres",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1E1E1E)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = serviceAddress,
+                            fontSize = 15.sp,
+                            color = Color(0xFF1E1E1E)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // Phone Section
+                    if (serviceDetail.phone.isNotBlank()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (isEnglish) "Phone: " else "Telefoon: ",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1E1E1E)
+                            )
+                            Text(
+                                text = serviceDetail.phone,
+                                fontSize = 15.sp,
+                                color = Color(0xFF1E1E1E)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+
+                    // Website Section
+                    if (!serviceDetail.url.isNullOrBlank()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (isEnglish) "Website: " else "Website: ",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1E1E1E)
+                            )
+                            Text(
+                                text = serviceDetail.url,
+                                fontSize = 14.sp,
+                                color = Color(0xFF0083CA),
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier.clickable {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(serviceDetail.url))
+                                    context.startActivity(intent)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+
+                    // Action Buttons Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        // Call Button
+                        if (serviceDetail.phone.isNotBlank()) {
+                            OutlinedButton(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                        data = Uri.parse("tel:${serviceDetail.phone}")
+                                    }
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Color(0xFF0083CA)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Call,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(if (isEnglish) "Call" else "Bellen")
+                            }
+                        }
+
+                        // Visit Website Button
+                        if (!serviceDetail.url.isNullOrBlank()) {
+                            OutlinedButton(
+                                onClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(serviceDetail.url))
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Color(0xFF0083CA)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Language,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Visit Website",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+
+                        // Open Map Button
+                        val hasLocation = (!serviceDetail.latitude.isNullOrBlank() && !serviceDetail.longitude.isNullOrBlank())
+                                || !serviceDetail.googleMapsUrl.isNullOrBlank()
+                                || serviceAddress.isNotBlank()
+
+                        if (hasLocation) {
+                            OutlinedButton(
+                                onClick = {
+                                    val mapUri = when {
+                                        !serviceDetail.latitude.isNullOrBlank() && !serviceDetail.longitude.isNullOrBlank() -> {
+                                            "geo:${serviceDetail.latitude},${serviceDetail.longitude}?q=${serviceDetail.latitude},${serviceDetail.longitude}($serviceName)"
+                                        }
+                                        !serviceDetail.googleMapsUrl.isNullOrBlank() -> {
+                                            serviceDetail.googleMapsUrl
+                                        }
+                                        else -> {
+                                            val query = Uri.encode(serviceAddress)
+                                            "https://www.google.com/maps/search/?api=1&query=$query"
+                                        }
+                                    }
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(mapUri))
+                                    context.startActivity(intent)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White,
+                                    contentColor = Color(0xFF0083CA)
+                                ),
+                                border = BorderStroke(1.dp, Color(0xFFE0E0E0))
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Map,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (isEnglish) "Open Map" else "Open Kaart",
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }
