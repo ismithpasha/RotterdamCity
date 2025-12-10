@@ -9,14 +9,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -36,10 +36,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dreamdiver.rotterdam.data.PreferencesManager
 import com.dreamdiver.rotterdam.ui.screens.AboutUsScreen
+import com.dreamdiver.rotterdam.ui.screens.ChecksScreen
 import com.dreamdiver.rotterdam.ui.screens.EducationalScreen
 import com.dreamdiver.rotterdam.ui.screens.EditProfileScreen
 import com.dreamdiver.rotterdam.ui.screens.EmergencyServiceScreen
 import com.dreamdiver.rotterdam.ui.screens.FavoritesScreen
+import com.dreamdiver.rotterdam.ui.screens.FeedScreen
 import com.dreamdiver.rotterdam.ui.screens.HomeScreen
 import com.dreamdiver.rotterdam.ui.screens.HospitalListScreen
 import com.dreamdiver.rotterdam.ui.screens.LoginScreen
@@ -329,28 +331,27 @@ fun CumillaCityApp(
                     },
                     viewModel = homeViewModel
                 )
-                AppDestinations.FAVORITES -> FavoritesScreen()
-                AppDestinations.PROFILE -> {
+                AppDestinations.FEED -> FeedScreen(isEnglish = isEnglish)
+                AppDestinations.CHECKS -> ChecksScreen(isEnglish = isEnglish)
+                AppDestinations.FAVORITES -> FavoritesScreen(isEnglish = isEnglish)
+                AppDestinations.MORE -> {
                     if (preferencesManager != null && authViewModel != null) {
-                        ProfileScreen(
+                        MoreScreen(
+                            isEnglish = isEnglish,
+                            onLanguageChange = onLanguageChange,
+                            onNavigateToNotice = { currentDetailScreen = DetailScreen.NOTICE },
+                            onNavigateToAbout = { currentDetailScreen = DetailScreen.ABOUT_US },
+                            onNavigateToPrivacy = { currentDetailScreen = DetailScreen.PRIVACY_POLICY },
+                            onNavigateToTerms = { currentDetailScreen = DetailScreen.TERMS_CONDITIONS },
                             preferencesManager = preferencesManager,
                             authViewModel = authViewModel,
                             onLogout = { authViewModel.logout() },
                             onEditProfile = { currentDetailScreen = DetailScreen.EDIT_PROFILE },
                             onNavigateToLogin = { showAuthScreen = AuthScreen.LOGIN },
-                            onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER },
-                            isEnglish = isEnglish
+                            onNavigateToRegister = { showAuthScreen = AuthScreen.REGISTER }
                         )
                     }
                 }
-                AppDestinations.MORE -> MoreScreen(
-                    isEnglish = isEnglish,
-                    onLanguageChange = onLanguageChange,
-                    onNavigateToNotice = { currentDetailScreen = DetailScreen.NOTICE },
-                    onNavigateToAbout = { currentDetailScreen = DetailScreen.ABOUT_US },
-                    onNavigateToPrivacy = { currentDetailScreen = DetailScreen.PRIVACY_POLICY },
-                    onNavigateToTerms = { currentDetailScreen = DetailScreen.TERMS_CONDITIONS }
-                )
             }
         }
     }
@@ -361,15 +362,17 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
+    FEED("Feed", Icons.AutoMirrored.Filled.Article),
+    CHECKS("Checks", Icons.Default.CheckCircleOutline),
     FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
     MORE("More", Icons.Default.MoreHoriz);
 
     fun getLabel(isEnglish: Boolean): String {
         return when (this) {
             HOME -> Strings.home(isEnglish)
+            FEED -> Strings.feed(isEnglish)
+            CHECKS -> Strings.checks(isEnglish)
             FAVORITES -> Strings.favorites(isEnglish)
-            PROFILE -> Strings.profile(isEnglish)
             MORE -> Strings.more(isEnglish)
         }
     }

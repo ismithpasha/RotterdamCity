@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun FavoritesScreen(
+fun ChecksScreen(
     modifier: Modifier = Modifier,
     isEnglish: Boolean = true
 ) {
@@ -24,14 +24,14 @@ fun FavoritesScreen(
             modifier = Modifier.padding(16.dp)
         ) {
             Text(
-                text = if (isEnglish) "Favorites" else "Favorieten",
+                text = if (isEnglish) "Checks" else "Controles",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = if (isEnglish) "Your favorite services will appear here" else "Uw favoriete diensten verschijnen hier",
+                text = if (isEnglish) "Your checks will appear here" else "Uw controles verschijnen hier",
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

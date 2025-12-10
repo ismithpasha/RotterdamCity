@@ -3,6 +3,8 @@ package com.dreamdiver.rotterdam.util
 object Strings {
     // Home Screen
     fun home(isEnglish: Boolean) = if (isEnglish) "Home" else "Thuis"
+    fun feed(isEnglish: Boolean) = if (isEnglish) "Feed" else "Feed"
+    fun checks(isEnglish: Boolean) = if (isEnglish) "Checks" else "Controles"
     fun favorites(isEnglish: Boolean) = if (isEnglish) "Favorites" else "Favorieten"
     fun profile(isEnglish: Boolean) = if (isEnglish) "Profile" else "Profiel"
     fun more(isEnglish: Boolean) = if (isEnglish) "More" else "Meer"
