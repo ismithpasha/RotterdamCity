@@ -80,10 +80,10 @@ fun HomeScreen(
     onNavigateToHospital: () -> Unit = {},
     onNavigateToEducational: () -> Unit = {},
     onNavigateToServiceList: (Int, String) -> Unit = { _, _ -> },
+    onNavigateToSearch: () -> Unit = {},
     viewModel: HomeViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
     var selectedService by remember { mutableStateOf<Service?>(null) }
     var selectedTrendingItem by remember { mutableStateOf<TrendingItem?>(null) }
     var selectedSlider by remember { mutableStateOf<com.dreamdiver.rotterdam.data.model.Slider?>(null) }
@@ -188,25 +188,8 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Search bar
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                placeholder = {
-                    Text(
-                        if (isEnglish) "Search for anything" else "Zoek naar alles",
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                },
+            // Search bar - clickable to open search screen
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .height(52.dp)
@@ -215,17 +198,29 @@ fun HomeScreen(
                         shape = RoundedCornerShape(12.dp),
                         spotColor = Color(0x14000000)
                     )
-                    .clip(RoundedCornerShape(12.dp)),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    disabledContainerColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
-                ),
-                singleLine = true
-            )
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White)
+                    .clickable { onNavigateToSearch() }
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = Color.Gray,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = if (isEnglish) "Search for anything" else "Zoek naar alles",
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.width(8.dp))
 

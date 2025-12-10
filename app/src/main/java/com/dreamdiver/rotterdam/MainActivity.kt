@@ -50,6 +50,7 @@ import com.dreamdiver.rotterdam.ui.screens.NoticeScreen
 import com.dreamdiver.rotterdam.ui.screens.PrivacyPolicyScreen
 import com.dreamdiver.rotterdam.ui.screens.ProfileScreen
 import com.dreamdiver.rotterdam.ui.screens.RegisterScreen
+import com.dreamdiver.rotterdam.ui.screens.SearchScreen
 import com.dreamdiver.rotterdam.ui.screens.ServiceListScreen
 import com.dreamdiver.rotterdam.ui.screens.SubCategoryListScreen
 import com.dreamdiver.rotterdam.ui.screens.NestedSubCategoryListScreen
@@ -298,6 +299,13 @@ fun CumillaCityApp(
                     )
                 }
             }
+            DetailScreen.SEARCH -> {
+                SearchScreen(
+                    onBackClick = { currentDetailScreen = null },
+                    isEnglish = isEnglish,
+                    allServices = homeViewModel.getAllServices()
+                )
+            }
             null -> {} // Should never happen due to if condition above
         }
     } else {
@@ -329,6 +337,7 @@ fun CumillaCityApp(
                         subcategoryListState = SubCategoryListState(categoryId, categoryName)
                         currentDetailScreen = DetailScreen.SUBCATEGORY_LIST
                     },
+                    onNavigateToSearch = { currentDetailScreen = DetailScreen.SEARCH },
                     viewModel = homeViewModel
                 )
                 AppDestinations.FEED -> FeedScreen(isEnglish = isEnglish)
@@ -389,7 +398,8 @@ enum class DetailScreen {
     SUBCATEGORY_LIST,
     NESTED_SUBCATEGORY_LIST,
     SERVICE_LIST,
-    EDIT_PROFILE
+    EDIT_PROFILE,
+    SEARCH
 }
 
 enum class AuthScreen {

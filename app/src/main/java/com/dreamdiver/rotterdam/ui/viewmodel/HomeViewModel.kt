@@ -20,6 +20,8 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private val _allServices = MutableStateFlow<List<Service>>(emptyList())
+
     init {
         loadCategories()
     }
@@ -35,9 +37,14 @@ class HomeViewModel(
                 val trendingResult = homeRepository.getTrending()
 
                 if (categoriesResult.isSuccess && featuredResult.isSuccess && trendingResult.isSuccess) {
+                    val featuredServices = featuredResult.getOrNull() ?: emptyList()
+
+                    // Store all services for search
+                    _allServices.value = featuredServices
+
                     _uiState.value = HomeUiState.Success(
                         categories = categoriesResult.getOrNull() ?: emptyList(),
-                        featuredServices = featuredResult.getOrNull() ?: emptyList(),
+                        featuredServices = featuredServices,
                         trendingItems = trendingResult.getOrNull() ?: emptyList()
                     )
                 } else {
@@ -50,6 +57,10 @@ class HomeViewModel(
                 _uiState.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    fun getAllServices(): List<Service> {
+        return _allServices.value
     }
 }
 
