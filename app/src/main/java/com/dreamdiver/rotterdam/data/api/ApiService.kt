@@ -4,6 +4,7 @@ import com.dreamdiver.rotterdam.data.model.AuthResponse
 import com.dreamdiver.rotterdam.data.model.CategoryResponse
 import com.dreamdiver.rotterdam.data.model.CategoryTreeResponse
 import com.dreamdiver.rotterdam.data.model.FeaturedServicesResponse
+import com.dreamdiver.rotterdam.data.model.FeedResponse
 import com.dreamdiver.rotterdam.data.model.LoginRequest
 import com.dreamdiver.rotterdam.data.model.ProfileUpdateResponse
 import com.dreamdiver.rotterdam.data.model.RegisterRequest
@@ -45,6 +46,20 @@ interface ApiService {
     @GET("api/v1/services/{serviceId}")
     suspend fun getServiceById(@Path("serviceId") serviceId: Int): ServiceDetailResponse
 
+    // Feed endpoints
+    @GET("api/v1/feeds")
+    suspend fun getAllFeeds(): FeedResponse
+
+    @GET("api/v1/feeds/latest")
+    suspend fun getLatestFeeds(): FeedResponse
+
+    @GET("api/v1/feeds/type/{type}")
+    suspend fun getFeedsByType(@Path("type") type: String): FeedResponse
+
+    @GET("api/v1/feeds/{id}")
+    suspend fun getFeedById(@Path("id") id: Int): FeedResponse
+
+    // Auth endpoints
     @POST("api/v1/auth/register")
     suspend fun register(@Body request: RegisterRequest): AuthResponse
 
